@@ -1,5 +1,7 @@
-# CITRARB--Web-Backend
+# CITRARB--API
 Coal City Connect App Rehabilitation Web Backend Codes
+
+[![CI](https://github.com/Sally-Builds/CITRARB--Web-Backend/actions/workflows/ci.yml/badge.svg)](https://github.com/Sally-Builds/demo_credit/actions/workflows/ci.yml)
 
 The project involves the rehabilitation of an existing android and web application known as Coal City Connect.
 The applications entails connecting various people within a locale of Enugu State (the coal city) through various attributes like: news, events, chats, music, videos etc.
