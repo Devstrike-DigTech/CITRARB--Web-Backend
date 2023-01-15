@@ -47,6 +47,22 @@ class UserService {
             throw new Error(error)
         }
     }
+
+    /**
+     * 
+     * @param id - user id to fetch
+     * @returns 
+     */
+    public async get(id: string): Promise<User | Error> {
+        try {
+            const user = await this.UserModel.findById(id)
+            if(!user) throw new Error('User Not Found')
+
+            return user
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
     
     /**
      * 
@@ -63,8 +79,27 @@ class UserService {
                 
             }
 
-            console.log(user)
             return user
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    /**
+     * 
+     * @param id - user id
+     * @returns - null
+     */
+    public async delete(id:string): Promise<null | Error> {
+        try {
+            const user = await this.UserModel.findByIdAndUpdate(id, {active: false}, {runValidators: true, new: true})
+
+            if(!user) {
+                throw new Error("No user found");
+                
+            }
+
+            return null
         } catch (error:any) {
             throw new Error(error)
         }

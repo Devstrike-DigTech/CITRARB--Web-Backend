@@ -4,9 +4,10 @@ import bcrypt from 'bcryptjs'
 
 
 const userSchema = new Schema<User> ({
-    name: {
+    username: {
         type: String,
-        required: [true, 'Please enter your first name.']
+        required: [true, 'Please enter your first name.'],
+        unique: true,
     },
     email: {
         type: String,
@@ -15,13 +16,21 @@ const userSchema = new Schema<User> ({
     },
     password: {
         type: String,
-        required: [true, 'Please enter your passwrod']
+        required: [true, 'Please enter your password']
     },
     role: {
         type: String,
-        enum: ['user', 'virtual assistant', 'admin'],
+        enum: ['user', 'admin'],
         default: 'user', 
     },
+    photo: {
+        type: String,
+    },
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 }, {
     toJSON: {
         transform: function (doc, ret) {
@@ -38,8 +47,14 @@ userSchema.pre('save', async function(next): Promise<void> {
     this.password = await bcrypt.hash(this.password, salt)
 })
 
-userSchema.methods.comparePassword = async function(inputedPassword:string) {
-    return await bcrypt.compare(inputedPassword, this.password)
+userSchema.methods.comparePassword = async function(inputtedPassword:string) {
+    return await bcrypt.compare(inputtedPassword, this.password)
 }
+
+//user deleted account
+userSchema.pre(/^find/, function(next) {
+    this.find({active: {$ne : false} })
+    next()
+  })
 
 export default model('User', userSchema)

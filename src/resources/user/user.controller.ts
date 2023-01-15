@@ -5,6 +5,7 @@ import HttpException from "@/utils/exceptions/httpExceptions";
 import validationMiddleware from "@/middleware/validation.middleware";
 import validate from './user.validation'
 import authenticate from "@/middleware/authenticate.middleware";
+import restrictTo from "@/middleware/restrictTo.middleware";
 
 class UserController implements Controller {
     public path = '/users'
@@ -19,12 +20,13 @@ class UserController implements Controller {
     private initializeRouter(){
         this.router.post(`${this.path}/signup`, validationMiddleware(validate.create), this.signup)
         this.router.post(`${this.path}/login`, validationMiddleware(validate.login), this.login)
+        this.router.get(`${this.path}/me`, authenticate, this.getMe)
 
-        this.router.route(`${this.path}`)
-        .get(authenticate, this.getUser)
+        this.router.route(`${this.path}/:id`).get(authenticate, restrictTo('admin'), this.getUser)
 
-        this.router.route(`${this.path}/:id`)
-        .patch(authenticate, this.updateUser)
+        this.router.route(`${this.path}/`).put(authenticate, this.updateMe)
+
+        this.router.route(`${this.path}/`).delete(authenticate, this.deleteMe)
     }
 
     private signup = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -55,6 +57,17 @@ class UserController implements Controller {
         }
     }
 
+    private getMe = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            res.status(200).json({
+                status: 'success',
+                user: req.user
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
     private getUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             res.status(200).json({
@@ -66,15 +79,27 @@ class UserController implements Controller {
         }
     }
 
-    private updateUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    private updateMe = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
-            const user = await this.userService.update(req.body, req.params.id)
+            const user = await this.userService.update(req.body, req.user.id)
 
             if(!user) return next(new HttpException('user not found', 404))
 
             res.status(200).json({
                 status: 'success',
                 user
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private deleteMe = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const user = await this.userService.delete(req.user.id)
+
+            res.status(204).json({
+                status: 'success',
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))
