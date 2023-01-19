@@ -25,6 +25,7 @@ const userSchema = new Schema<User> ({
     },
     photo: {
         type: String,
+        default: "default.jpg"
     },
     active: {
         type: Boolean,

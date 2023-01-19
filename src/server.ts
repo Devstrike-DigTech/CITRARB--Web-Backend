@@ -7,6 +7,7 @@ import App from './app';
 import UserController from '@/resources/user/user.controller';
 import OccupationController from '@/resources/occupation/occupation.controller';
 import FriendController from '@/resources/friend/friend.controller'
+import FriendRequestController from '@/resources/friendRequest/friendRequest.controller'
 
 validateEnv();
 
@@ -14,7 +15,8 @@ const app = new App(
     [
         new UserController(),
         new OccupationController(),
-        new FriendController()
+        new FriendController(),
+        new FriendRequestController()
     ],
     Number(process.env.PORT)
 );

@@ -12,7 +12,7 @@ class FriendService {
      */
     public async createFriend(data: Partial<Friend>): Promise<Friend | Error> {
         try {
-            const friend:Friend = await friendModel.create(data)
+            const friend = await friendModel.create(data)
 
             return friend
         } catch (error:any) {
@@ -28,7 +28,7 @@ class FriendService {
      */
     public async getAll(userId: string): Promise<Friend[] | Error> {
         try {
-            const friends: any[] = await friendModel.find({$or:[{friend: userId},{userId}]}).populate({path: 'friend', select: ['username', 'id']}).populate({path: 'userId', select: 'username'})
+            const friends: any[] = await friendModel.find({$or:[{friend: userId},{userId}]}).populate({path: 'friend', select: ['username', 'id', 'photo']}).populate({path: 'userId', select: ['username', 'id', 'photo']})
             if(friends.length < 1) return []
             return this.hack(friends, userId)
         } catch (error:any) {
