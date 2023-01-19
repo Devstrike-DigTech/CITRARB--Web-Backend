@@ -28,7 +28,7 @@ class FriendService {
      */
     public async getAll(userId: string): Promise<Friend[] | Error> {
         try {
-            const friends: any[] = await friendModel.find({$or:[{friendId: userId},{userId}]}).populate({path: 'friendId', select: ['username', 'id']}).populate({path: 'userId', select: 'username'})
+            const friends: any[] = await friendModel.find({$or:[{friend: userId},{userId}]}).populate({path: 'friend', select: ['username', 'id']}).populate({path: 'userId', select: 'username'})
             if(friends.length < 1) return []
             return this.hack(friends, userId)
         } catch (error:any) {
@@ -44,7 +44,7 @@ class FriendService {
     public async delete(id: string): Promise<null | Error> {
         try {
             const deletedFriend = await friendModel.findByIdAndDelete(id)
-            // const deletedFriend = await friendModel.findOneAndDelete({$or:[{friendId: userId},{userId}]})
+            // const deletedFriend = await friendModel.findOneAndDelete({$or:[{friend: userId},{userId}]})
 
             if(!deletedFriend) throw new Error("Not found")
 
@@ -57,15 +57,15 @@ class FriendService {
     private hack = (friends: any[], userId: string) => {
         return friends.map(e => {
             let el = e._doc
-            let newFriend = el.friendId
+            let newFriend = el.friend
             let newUser = userId
-            if(el.friendId.id == userId) {
+            if(el.friend.id == userId) {
                 newFriend = el.userId;
-                newUser = el.friendId.id;
+                newUser = el.friend.id;
             }
             return {
                 ...el,
-                friendId: newFriend,
+                friend: newFriend,
                 userId: newUser
             }
         })

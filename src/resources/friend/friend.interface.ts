@@ -1,7 +1,7 @@
 import { Document, ObjectId } from "mongoose";
 
 export default interface Friend extends Document {
-    friendId: ObjectId,
+    friend: ObjectId,
     userId: ObjectId,
     active: boolean
 }
