@@ -30,5 +30,4 @@ const occupationSchema = new Schema<Occupation>({
     }
 })
 
-const Occupation = model('Occupation', occupationSchema)
-export default Occupation
+export default model('Occupation', occupationSchema)
