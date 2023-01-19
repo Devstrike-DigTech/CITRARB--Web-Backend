@@ -6,13 +6,15 @@ import App from './app';
 // controller imports below
 import UserController from '@/resources/user/user.controller';
 import OccupationController from '@/resources/occupation/occupation.controller';
+import FriendController from '@/resources/friend/friend.controller'
 
 validateEnv();
 
 const app = new App(
     [
         new UserController(),
-        new OccupationController
+        new OccupationController(),
+        new FriendController()
     ],
     Number(process.env.PORT)
 );
