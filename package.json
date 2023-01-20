@@ -7,7 +7,6 @@
     "start": "tsc env-cmd -f .env.production node build/server.js",
     "dev": "env-cmd -f .env.development tsc-watch --onSuccess \"node ./build/server.js\"",
     "build": "tsc",
-    "postinstall": "npm i -g typescript",
     "build:watch": "npm run build -- --watch",
     "test": "jest",
     "test:stage": "npm run test -- --findRelatedTests",
