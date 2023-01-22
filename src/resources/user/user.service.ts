@@ -3,10 +3,11 @@ import User from "./user.interface";
 import AuthCredentials from "@/utils/interfaces/authCredential.interface";
 import {createToken} from '@/utils/token'
 import HttpException from "@/utils/exceptions/httpExceptions";
-
+import FriendService from "../friend/friend.service";
 
 class UserService {
     private UserModel = userModel
+    private friendService = new FriendService()
 
 
     /**
@@ -59,6 +60,27 @@ class UserService {
             if(!user) throw new Error('User Not Found')
 
             return user
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async getAll(id: string): Promise<User[] | Error> {
+        try {
+            let friendsList:string[] = []
+            //get list of friends
+            const myFriends = await this.friendService.getAll(id);
+            if(myFriends.length > 0) {
+                myFriends.forEach((el:any) => {
+                    friendsList.push(el.friend.id)
+                })
+            } 
+
+            //get all users
+            const members = await this.UserModel.find({"_id": {$nin: [...friendsList, id]}})
+
+            return members
+
         } catch (error:any) {
             throw new Error(error)
         }
