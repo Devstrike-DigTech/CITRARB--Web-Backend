@@ -1,6 +1,5 @@
-import fs from 'fs'
 import express, { Application } from 'express'
-import { connect } from 'mongoose'
+import { connect, ConnectOptions } from 'mongoose'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
@@ -45,8 +44,19 @@ class App {
   }
 
   private initializeDB () {
-    const url = `${process.env.DATABASE_URL}`
-    connect(url, {}).then(() => {
+    type ConnectionOptionsExtend = {
+      useNewUrlParser: boolean
+      useUnifiedTopology: boolean
+    }
+    const connectionOptions:ConnectOptions & ConnectionOptionsExtend = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+    let url = `${process.env.DATABASE_URL}`
+    if(process.env.NODE_ENV == 'production') {
+      url = `${process.env.DATABASE}`
+    }
+    connect(url, connectionOptions).then(() => {
       console.log('Database Connected Successully')
     })
   }
