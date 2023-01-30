@@ -14,6 +14,10 @@ const occupationSchema = new Schema<Occupation>({
         type: String,
         required: [true, "Please provide a phone number"]
     },
+    category: {
+        type: String,
+        enum: ['Tech', 'Service', 'Medical', 'Media', 'Business', 'Education', "Others"]
+    },
     description: {
         type: String,
         minlength: 25,
@@ -29,5 +33,11 @@ const occupationSchema = new Schema<Occupation>({
         select: false,
     }
 })
+
+occupationSchema.path('category').validate((values) => {
+    let occupations = ['Tech', 'Service', 'Medical', 'Media', 'Business', 'Education', "Others"]
+    occupations = occupations.map(el => el.toLowerCase())
+    return occupations.includes(values.toLowerCase())
+}, 'Invalid occupation category')   
 
 export default model('Occupation', occupationSchema)
