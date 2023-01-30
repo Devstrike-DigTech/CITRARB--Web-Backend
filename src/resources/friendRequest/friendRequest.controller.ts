@@ -39,7 +39,7 @@ export default class FriendRequestController implements Controller {
 
     private getAll = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
-            const data = await this.friendRequestService.getMyFriendRequests(req.user.id)
+            const data = await this.friendRequestService.getMyFriendRequests(req.user.id, req.query)
 
             res.status(200).json({
                 status: 'success',

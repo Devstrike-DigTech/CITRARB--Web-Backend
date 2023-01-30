@@ -24,6 +24,8 @@ class UserController implements Controller {
 
         this.router.route(`${this.path}/:id`).get(authenticate, restrictTo('admin'), this.getUser)
 
+        this.router.route(`${this.path}/`).get(authenticate, this.getMembers)
+
         this.router.route(`${this.path}/`).put(authenticate, this.updateMe)
 
         this.router.route(`${this.path}/`).delete(authenticate, this.deleteMe)
@@ -70,9 +72,23 @@ class UserController implements Controller {
 
     private getUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
+            const user = await this.userService.get(req.params.id)
+
             res.status(200).json({
                 status: 'success',
-                user: req.user
+                user: user
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private getMembers = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const members = await this.userService.getAll(req.user.id)
+            res.status(200).json({
+                status: 'success',
+                members
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))

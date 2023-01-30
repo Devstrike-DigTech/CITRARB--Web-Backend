@@ -5,7 +5,7 @@ function errorMiddleware (err: HttpException, req: Request, res: Response, next:
     const statusCode = err.statusCode || 500
     const message = err.message || 'Something went wrong'
 
-    console.log(err.stack)
+    // console.log(err.stack)
 
     res.status(statusCode).json({
         statusCode,

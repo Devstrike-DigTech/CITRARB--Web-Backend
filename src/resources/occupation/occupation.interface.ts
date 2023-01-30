@@ -6,5 +6,6 @@ export default interface Occupation extends Document {
     phone: string,
     description: string,
     active: boolean,
-    userId: ObjectId
+    userId: ObjectId,
+    category: string,
 }

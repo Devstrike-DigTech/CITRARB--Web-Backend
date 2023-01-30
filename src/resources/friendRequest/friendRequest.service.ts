@@ -1,7 +1,7 @@
 import FriendRequest from "./friendRequest.interface";
 import friendRequestModel from "./friendRequest.model";
 import FriendService from "../friend/friend.service";
-import { mongo } from "mongoose";
+import Query from "@/utils/apiFeatures/Query";
 
 export default class FriendRequestService {
     private friendService = new FriendService();
@@ -39,10 +39,15 @@ export default class FriendRequestService {
         }
     }
 
-    public async getMyFriendRequests(id: string): Promise<FriendRequest[] | Error> {
+    public async getMyFriendRequests(id: string, query: any): Promise<FriendRequest[] | Error> {
         try {
-            const friendRequests = await friendRequestModel.find({userId: id, status: 'pending'}).populate({path: "requester", select: ["id", "username", "photo"]})
-            return friendRequests
+            // const friendRequests = await friendRequestModel.find({userId: id, status: 'pending'}).populate({path: "requester", select: ["id", "username", "photo"]})
+            // return friendRequests
+            const friendRequests = friendRequestModel.find({userId: id}).populate({path: "requester", select: ["id", "username", "photo"]})
+            const features = new Query(friendRequests, query).filter().sort().limitFields().paginate();
+
+            const result = await features.query;
+            return result
         } catch (error:any) {
             throw new Error(error)
         }
@@ -57,7 +62,7 @@ export default class FriendRequestService {
     */
     public async updateRequest(id: string, userId: string, status: string): Promise<FriendRequest | Error> {
         try {
-            const update = await friendRequestModel.findOneAndUpdate({id, userId}, {status}, {runValidators: true, new: true})
+            const update = await friendRequestModel.findOneAndUpdate({_id: id, userId}, {status}, {runValidators: true, new: true})
 
             if(!update) throw new Error("Not found")
 

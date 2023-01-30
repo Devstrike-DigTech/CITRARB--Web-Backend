@@ -26,7 +26,7 @@ class FriendService {
      * @param userId - userId of user who want to fetch the list of friends
      * @returns - list of users friends or empty array if user has no friends
      */
-    public async getAll(userId: string): Promise<Friend[] | Error> {
+    public async getAll(userId: string): Promise<Friend[]> {
         try {
             const friends: any[] = await friendModel.find({$or:[{friend: userId},{userId}]}).populate({path: 'friend', select: ['username', 'id', 'photo']}).populate({path: 'userId', select: ['username', 'id', 'photo']})
             if(friends.length < 1) return []

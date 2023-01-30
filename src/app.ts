@@ -1,6 +1,5 @@
-import fs from 'fs'
 import express, { Application } from 'express'
-import { connect } from 'mongoose'
+import { connect, ConnectOptions } from 'mongoose'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
@@ -9,6 +8,7 @@ import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import Controller from '@/utils/interfaces/Controller.interface'
 import ErrorMiddleware from '@/middleware/error.middleware'
+import HttpException from './utils/exceptions/httpExceptions'
 
 class App {
   public port: number
@@ -20,7 +20,7 @@ class App {
     this.initializeMiddleware()
     this.initializeControllers(controllers)
     this.initializeDB()
-    this.intializeErrorHandler()
+    this.initializeErrorHandler()
   }
 
   private initializeMiddleware () {
@@ -36,18 +36,32 @@ class App {
 
   private initializeControllers (controllers: Controller[]) {
     controllers.map((controller: Controller) => {
-      this.app.use('/api', controller.router)
+      this.app.use(`/api`, controller.router)
     })
+    this.app.all('*', (req, res, next) => {
+      next(new HttpException(`Can't find ${req.originalUrl} on this server!`, 404));
+    });
   }
 
-  private intializeErrorHandler () {
+  private initializeErrorHandler () {
     this.app.use(ErrorMiddleware)
   }
 
   private initializeDB () {
-    const url = `${process.env.DATABASE_URL}`
-    connect(url, {}).then(() => {
-      console.log('Database Connected Successully')
+    type ConnectionOptionsExtend = {
+      useNewUrlParser: boolean
+      useUnifiedTopology: boolean
+    }
+    const connectionOptions:ConnectOptions & ConnectionOptionsExtend = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+    let url = `${process.env.DATABASE_URL}`
+    if(process.env.NODE_ENV == 'production') {
+      url = `${process.env.DATABASE}`
+    }
+    connect(url, connectionOptions).then(() => {
+      console.log('Database Connected Successfully')
     })
   }
 
