@@ -8,6 +8,7 @@ import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import Controller from '@/utils/interfaces/Controller.interface'
 import ErrorMiddleware from '@/middleware/error.middleware'
+import HttpException from './utils/exceptions/httpExceptions'
 
 class App {
   public port: number
@@ -19,7 +20,7 @@ class App {
     this.initializeMiddleware()
     this.initializeControllers(controllers)
     this.initializeDB()
-    this.intializeErrorHandler()
+    this.initializeErrorHandler()
   }
 
   private initializeMiddleware () {
@@ -35,11 +36,14 @@ class App {
 
   private initializeControllers (controllers: Controller[]) {
     controllers.map((controller: Controller) => {
-      this.app.use('/api', controller.router)
+      this.app.use(`/api`, controller.router)
     })
+    this.app.all('*', (req, res, next) => {
+      next(new HttpException(`Can't find ${req.originalUrl} on this server!`, 404));
+    });
   }
 
-  private intializeErrorHandler () {
+  private initializeErrorHandler () {
     this.app.use(ErrorMiddleware)
   }
 
@@ -57,7 +61,7 @@ class App {
       url = `${process.env.DATABASE}`
     }
     connect(url, connectionOptions).then(() => {
-      console.log('Database Connected Successully')
+      console.log('Database Connected Successfully')
     })
   }
 

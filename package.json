@@ -4,7 +4,7 @@
   "description": "Coal city connect application rehabilitation",
   "main": "index.js",
   "scripts": {
-    "start": "node build/server.js",
+    "start": "env-cmd -f .env.production node build/server.js",
     "dev": "env-cmd -f .env.development tsc-watch --onSuccess \"node ./build/server.js\"",
     "build": "tsc",
     "build:watch": "npm run build -- --watch",
@@ -45,6 +45,7 @@
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "module-alias": "^2.2.2",
+    "moment": "^2.29.4",
     "mongoose": "^6.3.3",
     "morgan": "^1.10.0",
     "randomstring": "^1.2.2",
