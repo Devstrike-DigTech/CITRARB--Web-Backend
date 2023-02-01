@@ -13,13 +13,19 @@ export default class EventService {
     public async create(data: Partial<Event>): Promise<Event | Error> {
         try {
 
+            if(data.coHosts) {
+                for(var i = 0; i<data.coHosts.length; i++) {
+                    if(!mongoose.Types.ObjectId.isValid((data.coHosts[i] as string))) {
+                        throw new Error('Not a valid id in coHosts')
+                    }
+                }
+            }
             //1) Make sure its only friends a user can host an event with
-
             const event = await eventModel.create(data)
 
             return event
         } catch (error:any) {
-            throw new Error(error)
+            throw new Error((error as any))
         }
     }
 
@@ -30,7 +36,7 @@ export default class EventService {
      */
     public async get(id: string): Promise<Event> {
         try {
-            const event = await eventModel.findById(id)
+            const event = await eventModel.findById(id).populate({path: 'coHosts'})
 
             if(!event) throw new Error("not found")
 
@@ -47,7 +53,7 @@ export default class EventService {
      */
     public async getAll(query: any): Promise<any[] | null | Error> {
         try {
-            const events = eventModel.find({})
+            const events = eventModel.find({}).populate({path: 'coHosts'})
             let features = new Query(events, query).filter().sort().limitFields().paginate()
             const results = await features.query
 
