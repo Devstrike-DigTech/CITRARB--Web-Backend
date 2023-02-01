@@ -36,6 +36,9 @@ const eventSchema = new Schema<Event>({
     },
     avgRating: {
         type: Number
+    },
+    eventAttendance: {
+        type: [Schema.Types.ObjectId]
     }
 },
 {
@@ -43,12 +46,5 @@ const eventSchema = new Schema<Event>({
     toObject: { virtuals: true },
   }
 )
-
-eventSchema.virtual('attendees', {
-    foreignField: 'eventId',
-    localField: '_id',
-    ref: 'EventAttendance'
-})
-
 
 export default model('Event', eventSchema)
