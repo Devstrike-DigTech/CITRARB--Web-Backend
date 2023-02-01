@@ -24,7 +24,8 @@ class EventController implements Controller {
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 
         this.router.get(`${this.path}/me`, authenticate, this.get)
-        this.router.route(`${this.path}/:id`).put(authenticate, validationMiddleware(validate.create), this.update)
+        this.router.route(`${this.path}/:id`).put(authenticate, validationMiddleware(validate.update), this.update)
+        this.router.route(`${this.path}/:id`).delete(authenticate, this.delete)
     }
 
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -77,6 +78,19 @@ class EventController implements Controller {
             const data = await this.eventService.update(req.params.id, req.user.id, req.body)
 
             res.status(200).json({
+                status: 'success',
+                data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private delete = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.eventService.delete(req.params.id, req.user.id)
+
+            res.status(204).json({
                 status: 'success',
                 data,
             })
