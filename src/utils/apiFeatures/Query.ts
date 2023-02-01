@@ -11,10 +11,10 @@ class Query {
       const queryObj = { ...this.queryString };
       const excludedFields = ['page', 'sort', 'limit', 'fields'];
       excludedFields.forEach((el) => delete queryObj[el]);
-  
+      
       let queryStr = JSON.stringify(queryObj);
       queryStr = queryStr.replace(
-        /\b(gte|lt|lte|gt|eq|ne|nin)\b/g,
+        /\b(gte|lt|lte|gt|eq|ne|in|exists|elemMatch|nin)\b/g,
         (match) => `$${match}`
       );
   

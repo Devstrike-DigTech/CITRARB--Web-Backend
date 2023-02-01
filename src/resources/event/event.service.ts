@@ -1,6 +1,7 @@
 import Event from "./event.interface";
 import eventModel from "./event.model";
 import Query from "@/utils/apiFeatures/Query";
+import mongoose from "mongoose";
 
 export default class EventService {
 
@@ -29,7 +30,7 @@ export default class EventService {
      */
     public async get(id: string): Promise<Event> {
         try {
-            const event = await eventModel.findById(id).populate("attendees")
+            const event = await eventModel.findById(id)
 
             if(!event) throw new Error("not found")
 
@@ -46,9 +47,10 @@ export default class EventService {
      */
     public async getAll(query: any): Promise<any[] | null | Error> {
         try {
-            const events = eventModel.find({}).populate("attendees")
+            const events = eventModel.find({})
             let features = new Query(events, query).filter().sort().limitFields().paginate()
             const results = await features.query
+
 
             return results
         } catch (error:any) {

@@ -10,5 +10,6 @@ export default interface Event extends Document {
     location: string,
     description: string,
     numberOfAttendee: number,
-    ratingsQuantity: number
+    ratingsQuantity: number,
+    eventAttendance: ObjectId[]
 }
