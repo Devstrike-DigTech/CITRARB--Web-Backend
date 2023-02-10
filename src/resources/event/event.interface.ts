@@ -3,7 +3,7 @@ import { Document, ObjectId } from "mongoose";
 
 export default interface Event extends Document {
     name: string,
-    coHosts: ObjectId[],
+    coHosts: ObjectId[] | string,
     time: Date,
     host: ObjectId,
     avgRating: number,

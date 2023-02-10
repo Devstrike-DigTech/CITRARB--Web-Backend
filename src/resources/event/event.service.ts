@@ -13,13 +13,19 @@ export default class EventService {
     public async create(data: Partial<Event>): Promise<Event | Error> {
         try {
 
+            if(data.coHosts) {
+                for(var i = 0; i<data.coHosts.length; i++) {
+                    if(!mongoose.Types.ObjectId.isValid((data.coHosts[i] as string))) {
+                        throw new Error('Not a valid id in coHosts')
+                    }
+                }
+            }
             //1) Make sure its only friends a user can host an event with
-
             const event = await eventModel.create(data)
 
             return event
         } catch (error:any) {
-            throw new Error(error)
+            throw new Error((error as any))
         }
     }
 
@@ -30,7 +36,7 @@ export default class EventService {
      */
     public async get(id: string): Promise<Event> {
         try {
-            const event = await eventModel.findById(id)
+            const event = await eventModel.findById(id).populate({path: 'coHosts'})
 
             if(!event) throw new Error("not found")
 
@@ -47,7 +53,7 @@ export default class EventService {
      */
     public async getAll(query: any): Promise<any[] | null | Error> {
         try {
-            const events = eventModel.find({})
+            const events = eventModel.find({}).populate({path: 'coHosts'})
             let features = new Query(events, query).filter().sort().limitFields().paginate()
             const results = await features.query
 
@@ -68,7 +74,7 @@ export default class EventService {
     // public async update(id: string, userId: string, data: Partial<Event>): Promise<Event | Error> {
         public async update(id: string, userId: string, data: any): Promise<Event | Error> {
         try {
-            const event = await eventModel.findOneAndUpdate({id, userId}, data, {runValidators: true, new: true})
+            const event = await eventModel.findOneAndUpdate({id, host: userId}, data, {runValidators: true, new: true})
 
             if(!event) throw new Error("not found")
 
@@ -85,9 +91,9 @@ export default class EventService {
      * @param userId - userId of the event host
      * @returns - null
      */
-    public async delete(id: string, userId: string, data: Partial<Event>): Promise<null | Error> {
+    public async delete(id: string, userId: string): Promise<null | Error> {
         try {
-            const event = await eventModel.findOneAndDelete({id, userId})
+            const event = await eventModel.findOneAndDelete({id, host: userId})
 
             if(!event) throw new Error("not found")
 
