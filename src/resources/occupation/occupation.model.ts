@@ -23,6 +23,12 @@ const occupationSchema = new Schema<Occupation>({
         minlength: 25,
         maxlength: 150,
     },
+    location: {
+        type: String,
+    },
+    yearsOfExperience: {
+        type: String,
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User"
