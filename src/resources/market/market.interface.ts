@@ -1,8 +1,13 @@
 import { Document, ObjectId } from "mongoose";
 
+interface Images {
+    fileId: string,
+    webContentLink: string
+}
+
 export default interface Market extends Document {
     name: string,
-    images: string[],
+    images: Images[],
     description: string,
     userId: ObjectId,
     price: number,

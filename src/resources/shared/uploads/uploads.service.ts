@@ -7,12 +7,13 @@ import path from "path";
 class GoogleDriveAPI {
     private KEYFILEPATH = path.join(__dirname,"..", "..", "..","..","coal-city-connect-368804-f3c9325a1e58.json");
     private SCOPES = ["https://www.googleapis.com/auth/drive"];
-    private folderId = "11PqEvj1I29MTATF9P3iuH4jhQ1vz4rL-"
-    
+    private folderId = process.env.GOOGLE_DRIVE_FOLDER_ID
     private auth = new google.auth.GoogleAuth({
     keyFile: this.KEYFILEPATH,
     scopes: this.SCOPES,
     });
+    private drive = google.drive({ version: 'v3', auth:this.auth })
+    
 
     public async uploadImages (files: any[]): Promise<any[]> {
         try {   
@@ -21,7 +22,7 @@ class GoogleDriveAPI {
             for(let file of files) {
                 const id = await this.upload(file)
                 const data = await this.getFile(id)
-                result.push(data)
+                result.push({fileId: id, webContentLink: data})
             }
 
             return result
@@ -34,7 +35,7 @@ class GoogleDriveAPI {
         try {
             const bufferStream = new stream.PassThrough();
             bufferStream.end(file.buffer);
-            const { data } = await google.drive({ version: 'v3', auth:this.auth }).files.create({
+            const { data } = await this.drive.files.create({
                 media: {
                 mimeType: file.mimeType,
                 body: bufferStream,
@@ -54,9 +55,8 @@ class GoogleDriveAPI {
 
     private async getFile(id: string): Promise<string> {
         try {
-            const drive = google.drive({ version: 'v3', auth: this.auth });
 
-            await drive.permissions.create({
+            await this.drive.permissions.create({
                 fileId: id,
                 requestBody: {
                   role: 'reader',
@@ -64,11 +64,22 @@ class GoogleDriveAPI {
                 },
               });
 
-            const {data} =  await drive.files.get({ fileId: id, fields: 'webContentLink' });
-            console.log(data.webContentLink, 'from')
+            const {data} =  await this.drive.files.get({ fileId: id, fields: 'webContentLink' });
             return data.webContentLink
         } catch (error:any) {
             console.log(error)
+            throw new Error(error)
+        }
+    }
+
+    public async deleteFile(payload:any[]): Promise<void> {
+        try {
+            for(var file of payload) {
+                const response = await this.drive.files.delete({
+                    fileId: file.fileId
+                })
+            }
+        } catch (error:any) {
             throw new Error(error)
         }
     }

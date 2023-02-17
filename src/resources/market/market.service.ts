@@ -71,8 +71,10 @@ class MarketService {
 
     public async delete(userId: string, id: string) : Promise<void> {
         try {
-            const result = await marketModel.findOneAndDelete({id: userId});
+            const result = await marketModel.findOneAndDelete({id, userId});
             if(!result) throw new Error("Not found")
+
+            await this.googleDriveAPI.deleteFile(result.images)
 
         } catch (error:any) {
             throw new Error(error)

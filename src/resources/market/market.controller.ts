@@ -27,13 +27,13 @@ class MarketController implements Controller {
 
         this.router.get(`${this.path}/:id`, authenticate, this.get)
         this.router.route(`${this.path}/:id`).put(authenticate, validationMiddleware(validate.update), this.update)
+        this.router.route(`${this.path}/:id`).delete(authenticate,  this.delete)
     }
 
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             req.body.userId = req.user.id
             const files = req.files as Express.Multer.File[]
-            console.log(req.files)
             req.body.files = files
             const data = await this.service.create(req.body);
 
@@ -88,6 +88,18 @@ class MarketController implements Controller {
             res.status(200).json({
                 status: 'success',
                 data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private delete = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.service.delete(req.user.id, req.params.id)
+
+            res.status(204).json({
+                status: 'success',
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))
