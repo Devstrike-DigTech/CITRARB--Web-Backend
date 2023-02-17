@@ -8,4 +8,6 @@ export default interface Occupation extends Document {
     active: boolean,
     userId: ObjectId,
     category: string,
+    yearsOfExperience: string,
+    location: string,
 }

@@ -11,6 +11,7 @@ import FriendRequestController from '@/resources/friendRequest/friendRequest.con
 import EventController from '@/resources/event/event.controller'
 import EventAttendanceController from '@/resources/eventAttendance/eventAttendance.controller'
 import RatingController from '@/resources/rating/rating.controller'
+import MarketController from './resources/market/market.controller';
 
 validateEnv();
 
@@ -23,6 +24,7 @@ const app = new App(
         new EventController(),
         new EventAttendanceController(),
         new RatingController(),
+        new MarketController(),
     ],
     Number(process.env.PORT)
 );
