@@ -4,28 +4,16 @@ import Controller from "@/utils/interfaces/Controller.interface";
 import HttpException from "@/utils/exceptions/httpExceptions";
 import validationMiddleware from "@/middleware/validation.middleware";
 import authenticate from "@/middleware/authenticate.middleware";
-import MarketService from "./market.service";
-import validate from './market.validation'
-import GoogleDriveAPI from "../shared/uploads/uploads.service";
+import EyeWitnessService from "./eyeWitness.service";
+import validate from './eyeWitness.validation'
 
 
-class MarketController implements Controller {
-    private service = new MarketService()
-
-    public path = '/products'
+class EyeWitnessController implements Controller {
+    private service = new EyeWitnessService()
+    public path = '/eye_witness'
     public router = Router()
 
-
-       private multerStorage = multer.memoryStorage()
-    // private multerStorage = multer.diskStorage({
-    //     destination(req, file, callback) {
-    //     callback(null, 'public/')
-    //     },
-    //     filename(req, file, callback) {
-    //         console.log(file, 'what is happening for God sake')
-    //         callback(null, file.originalname)
-    //     },
-    // });
+    private multerStorage = multer.memoryStorage();
 
     constructor(){
         this.initializeRouter()
@@ -33,11 +21,12 @@ class MarketController implements Controller {
 
     private initializeRouter(){
 
-        this.router.route(`${this.path}/`).post(authenticate, this.upload.array('images', 3), this.formatFile, validationMiddleware(validate.create), this.create)
+        // this.router.route(`${this.path}/`).post(authenticate, this.upload.array('images', 3), this.formatFile, validationMiddleware(validate.create), this.create)
+        this.router.post(`${this.path}/`, authenticate, this.upload.any(), validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 
         this.router.get(`${this.path}/:id`, authenticate, this.get)
-        this.router.route(`${this.path}/:id`).put(authenticate, validationMiddleware(validate.update), this.update)
+        this.router.route(`${this.path}/:id`).put(authenticate, this.update)
         this.router.route(`${this.path}/:id`).delete(authenticate,  this.delete)
     }
 
@@ -45,9 +34,10 @@ class MarketController implements Controller {
         try {
             req.body.userId = req.user.id
             const files = req.files as Express.Multer.File[]
-            // req.body.files = files
-            req.body.files = files
-            
+            const videos = files.filter((el: any) => el.mimetype.startsWith('video'))
+            const images = files.filter((el: any) => el.mimetype.startsWith('image'))
+            req.body.images = images
+            req.body.videos = videos
             const data = await this.service.create(req.body);
 
             res.status(201).json({
@@ -131,10 +121,11 @@ class MarketController implements Controller {
     }
 
     private multerFilter = (req: any, file: any, cb: any) => {
-        if (file.mimetype.startsWith('image')) {
+        const fileSize = parseInt(req.headers["content-length"])
+        if (file.mimetype.startsWith('image') || file.mimetype.startsWith('video')) {
           cb(null, true);
         } else {
-          cb(new HttpException('Not an image! Please upload only images.', 400), false);
+          cb(new HttpException('Not an image! Please upload only images and videos.', 400), false);
         }
       };
 
@@ -143,10 +134,6 @@ class MarketController implements Controller {
         fileFilter: this.multerFilter,
       });
 
-    private uploadProductImages = this.upload.fields([
-        { name: 'images', maxCount: 3 },
-      ]);
-
 }
 
-export default MarketController
+export default EyeWitnessController

@@ -12,6 +12,7 @@ import EventController from '@/resources/event/event.controller'
 import EventAttendanceController from '@/resources/eventAttendance/eventAttendance.controller'
 import RatingController from '@/resources/rating/rating.controller'
 import MarketController from './resources/market/market.controller';
+import EyeWitnessController from './resources/eyeWitness/eyeWitness.controller';
 
 validateEnv();
 
@@ -24,6 +25,7 @@ const app = new App(
         new EventController(),
         new EventAttendanceController(),
         new RatingController(),
+        new EyeWitnessController(),
         new MarketController(),
     ],
     Number(process.env.PORT)
