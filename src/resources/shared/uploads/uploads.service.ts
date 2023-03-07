@@ -55,7 +55,6 @@ class GoogleDriveAPI {
 
                 },
               });
-            console.log(data)
             return data.id
         } catch (error:any) {
             console.log(error)
@@ -75,7 +74,6 @@ class GoogleDriveAPI {
               });
 
             const {data} =  await this.drive.files.get({ fileId: id, fields: 'webContentLink' });
-            console.log(data)
             return data.webContentLink
         } catch (error:any) {
             console.log(error)
