@@ -73,7 +73,7 @@ export default class RatingService {
                 ratingsQuantity: stats[0].nRating
             }
             // await eventModel.findOneAndUpdate({id: eventId, userId}, data, {runValidators: true, new: true})
-            await this.eventService.update(eventId, userId, data)
+            await this.eventService.updateV2(eventId, data)
         } catch (error:any) {
             throw new Error(error)
         }

@@ -13,6 +13,7 @@ import EventAttendanceController from '@/resources/eventAttendance/eventAttendan
 import RatingController from '@/resources/rating/rating.controller'
 import MarketController from './resources/market/market.controller';
 import EyeWitnessController from './resources/eyeWitness/eyeWitness.controller';
+import ReactionUploadController from './resources/reactionUploads/rating.controller'
 
 validateEnv();
 
@@ -25,6 +26,7 @@ const app = new App(
         new EventController(),
         new EventAttendanceController(),
         new RatingController(),
+        new ReactionUploadController(),
         new EyeWitnessController(),
         new MarketController(),
     ],

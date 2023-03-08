@@ -6,6 +6,7 @@ import validationMiddleware from "@/middleware/validation.middleware";
 import authenticate from "@/middleware/authenticate.middleware";
 import EyeWitnessService from "./eyeWitness.service";
 import validate from './eyeWitness.validation'
+import RatingController from "../reactionUploads/rating.controller";
 
 
 class EyeWitnessController implements Controller {
@@ -20,8 +21,8 @@ class EyeWitnessController implements Controller {
     }
 
     private initializeRouter(){
+        this.router.use(`${this.path}/:uploadId/reactions`, new RatingController().router)
 
-        // this.router.route(`${this.path}/`).post(authenticate, this.upload.array('images', 3), this.formatFile, validationMiddleware(validate.create), this.create)
         this.router.post(`${this.path}/`, authenticate, this.upload.any(), validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 

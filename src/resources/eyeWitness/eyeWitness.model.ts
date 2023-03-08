@@ -27,7 +27,13 @@ const eyeWitnessSchema = new Schema<EyeWitness>({
     isVerified: {
         type: Boolean,
         default: false,
-    }
+    },
+    ratingsQuantity: {
+        type: Number,
+    },
+    avgRating: {
+        type: Number
+    },
 })
 
 export default model('EyeWitness', eyeWitnessSchema)

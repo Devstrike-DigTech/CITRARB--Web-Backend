@@ -13,4 +13,6 @@ export default interface EyeWitness extends Document {
     title: string,
     description: string,
     isVerified: boolean,
+    avgRating: number,
+    ratingsQuantity: number
 } 

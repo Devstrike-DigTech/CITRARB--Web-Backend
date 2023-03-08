@@ -63,6 +63,24 @@ class EyeWitnessService {
         }
     }
 
+    /**
+     * 
+     * @param id 
+     * @param data 
+     * @returns 
+     */
+    public async updateV2(id: string, data: any): Promise<EyeWitness | Error> {
+        try {
+            const result = await eyeWitnessModel.findByIdAndUpdate(id, data, {runValidators: true, new: true})
+
+            if(!result) throw new Error("not found")
+
+            return result
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
     public async delete(userId: string, id: string) : Promise<void> {
         try {
             const result = await eyeWitnessModel.findOneAndDelete({id, userId});
