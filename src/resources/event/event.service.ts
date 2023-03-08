@@ -85,6 +85,25 @@ export default class EventService {
     }
 
 
+        /**
+         * 
+         * @param id - event Id
+         * @param data - data to update
+         * @returns 
+         */
+        public async updateV2(id: string, data: any): Promise<Event | Error> {
+            try {
+                const event = await eventModel.findByIdAndUpdate(id, data, {runValidators: true, new: true})
+    
+                if(!event) throw new Error("not found")
+    
+                return event
+            } catch (error:any) {
+                throw new Error(error)
+            }
+        }
+
+
     /**
      * 
      * @param id - event id to update
