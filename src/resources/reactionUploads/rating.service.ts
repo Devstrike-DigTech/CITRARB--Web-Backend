@@ -37,6 +37,15 @@ export default class RatingService {
         }
     }
 
+    public async update(userId: string, uploadId: string, rating: number): Promise<Rating | Error> {
+      const updatedRating = await ratingModel.findOneAndUpdate({userId, uploadId}, {rating}, {new: true, runValidators: true})
+      if(!updatedRating) throw new Error('not found')
+      await this.updateAvgRating(updatedRating.uploadId, updatedRating.userId)
+
+      return updatedRating
+
+    }
+
     /**
      * 
      * @param uploadId - id of uploadId

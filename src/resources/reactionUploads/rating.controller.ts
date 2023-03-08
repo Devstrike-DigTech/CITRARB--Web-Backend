@@ -22,6 +22,7 @@ export default class ReactionUploadController implements Controller {
     private initializeRouter(){
         this.app.use(`${this.path}`, this.router)
         this.router.route("/").post(authenticate, validationMiddleware(validate.create), this.create)
+        this.router.route("/").patch(authenticate, validationMiddleware(validate.create), this.update)
 
     }
 
@@ -36,6 +37,19 @@ export default class ReactionUploadController implements Controller {
             })
         } catch (error:any) {
            next(new HttpException(error.message, error.statusCode)) 
+        }
+    }
+
+    private update = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.ratingService.update(req.user.id, req.params.uploadId, req.body.rating)
+
+            res.status(200).json({
+                status: "success",
+                data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
         }
     }
 }
