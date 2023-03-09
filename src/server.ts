@@ -14,6 +14,8 @@ import RatingController from '@/resources/rating/rating.controller'
 import MarketController from './resources/market/market.controller';
 import EyeWitnessController from './resources/eyeWitness/eyeWitness.controller';
 import ReactionUploadController from './resources/reactionUploads/rating.controller'
+import MusicController from './resources/music/music.controller';
+import ReactionMusicController from './resources/reactionMusic/rating.controller';
 
 validateEnv();
 
@@ -29,6 +31,8 @@ const app = new App(
         new ReactionUploadController(),
         new EyeWitnessController(),
         new MarketController(),
+        new MusicController(),
+        new ReactionMusicController()
     ],
     Number(process.env.PORT)
 );
