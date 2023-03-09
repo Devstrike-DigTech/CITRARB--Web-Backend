@@ -17,6 +17,11 @@ const eyeWitnessSchema = new Schema<EyeWitness>({
     location: {
         type: String,
     },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: [true, 'Enter userId']
+    },
     title: {
         type: String,
         required: [true, 'Enter a title']
