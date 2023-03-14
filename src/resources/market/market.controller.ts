@@ -43,6 +43,8 @@ class MarketController implements Controller {
 
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
+            console.log(req.body)
+            console.log(req.files)
             req.body.userId = req.user.id
             const files = req.files as Express.Multer.File[]
             // req.body.files = files
