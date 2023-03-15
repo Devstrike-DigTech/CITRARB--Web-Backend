@@ -7,6 +7,7 @@ export default interface User extends Document {
     password: string,
     role: string,
     photo: string,
+    phone: string,
     active: boolean,
     comparePassword(inputedPassword:string):boolean
 }

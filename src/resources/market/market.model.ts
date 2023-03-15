@@ -13,7 +13,7 @@ const marketSchema = new Schema<Market> ({
     },
     category: {
         type: String,
-        enum: ['Clothing', 'Electronics', 'Others']
+        // enum: ['Clothing', 'Electronics', 'Others']
     },
     images: 
         [
@@ -36,10 +36,10 @@ const marketSchema = new Schema<Market> ({
     }
 })
 
-marketSchema.path('category').validate((values) => {
-    let occupations = ['Clothing', 'Electronics', 'Others']
-    occupations = occupations.map(el => el.toLowerCase())
-    return occupations.includes(values.toLowerCase())
-}, 'Invalid product category')  
+// marketSchema.path('category').validate((values) => {
+//     let occupations = ['Clothing', 'Electronics', 'Others']
+//     occupations = occupations.map(el => el.toLowerCase())
+//     return occupations.includes(values.toLowerCase())
+// }, 'Invalid product category')  
 
 export default model("Market", marketSchema)
