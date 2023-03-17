@@ -28,6 +28,17 @@ const musicSchema = new Schema<Music>({
     avgRating: {
         type: Number
     }
+},
+{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  })
+
+  musicSchema.virtual('reactions', {
+    foreignField: 'musicId', 
+    localField: '_id',
+    ref: 'ReactionMusic'
 })
 
 export default model('Music', musicSchema)

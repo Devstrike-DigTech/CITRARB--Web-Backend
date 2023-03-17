@@ -39,6 +39,17 @@ const eyeWitnessSchema = new Schema<EyeWitness>({
     avgRating: {
         type: Number
     },
+},
+{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  })
+
+eyeWitnessSchema.virtual('reactions', {
+    foreignField: 'uploadId', 
+    localField: '_id',
+    ref: 'ReactionUpload'
 })
 
 export default model('EyeWitness', eyeWitnessSchema)

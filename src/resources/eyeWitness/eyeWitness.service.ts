@@ -40,7 +40,7 @@ class EyeWitnessService {
 
     public async getAll(query: any) : Promise<any[]> {
         try {
-            const eyeWitness = eyeWitnessModel.find({active: true}).populate('userId');
+            const eyeWitness = eyeWitnessModel.find({active: true}).populate('userId').populate('reactions');
             const features = new Query(eyeWitness, query).filter().sort().limitFields().paginate();
 
             const result = await features.query;

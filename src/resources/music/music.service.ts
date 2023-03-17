@@ -44,7 +44,7 @@ class MusicService {
 
     public async getAll(query: any) : Promise<any[]> {
         try {
-            const music = musicModel.find({active: true}).populate('userId');
+            const music = musicModel.find({active: true}).populate('userId').populate('reactions');
             const features = new Query(music, query).filter().sort().limitFields().paginate();
 
             const result = await features.query;
