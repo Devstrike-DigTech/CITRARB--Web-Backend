@@ -22,6 +22,7 @@ class EyeWitnessService {
 
             return eyeWitness
         } catch (error:any) {
+            console.log(error)
             throw new Error(error)
         }
     }

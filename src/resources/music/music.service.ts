@@ -26,6 +26,7 @@ class MusicService {
 
             return music
         } catch (error:any) {
+            console.log(error)
             throw new Error(error)
         }
     }
