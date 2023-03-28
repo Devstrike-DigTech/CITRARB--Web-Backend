@@ -39,6 +39,7 @@ class EyeWitnessController implements Controller {
             const images = files.filter((el: any) => el.mimetype.startsWith('image'))
             req.body.images = images
             req.body.videos = videos
+            console.log(req.body)
             const data = await this.service.create(req.body);
 
             res.status(201).json({

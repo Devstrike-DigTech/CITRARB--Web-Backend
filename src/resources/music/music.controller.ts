@@ -35,6 +35,8 @@ class MusicController implements Controller {
         try {
             req.body.userId = req.user.id
             req.body.file = [req.file as Express.Multer.File]
+
+            console.log(req.body)
             const data = await this.service.create(req.body);
 
             res.status(201).json({
