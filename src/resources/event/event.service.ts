@@ -53,7 +53,7 @@ export default class EventService {
      */
     public async getAll(query: any): Promise<any[] | null | Error> {
         try {
-            const events = eventModel.find({}).populate({path: 'coHosts'})
+            const events = eventModel.find({}).populate([{path: 'host'},{path: 'coHosts'}])
             let features = new Query(events, query).filter().sort().limitFields().paginate()
             const results = await features.query
 

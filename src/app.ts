@@ -9,10 +9,14 @@ import bodyParser from 'body-parser'
 import Controller from '@/utils/interfaces/Controller.interface'
 import ErrorMiddleware from '@/middleware/error.middleware'
 import HttpException from './utils/exceptions/httpExceptions'
+import redisClient from '@/utils/cache/connection'
+import * as redis from 'redis';
 
 class App {
   public port: number
   public app: Application
+
+  static redisClient:any;
 
   constructor (controllers: Controller[], port: number) {
     this.port = port
@@ -24,6 +28,7 @@ class App {
   }
 
   private initializeMiddleware () {
+    redisClient(redis).then((res:any) => App.redisClient = res).catch((e) => console.log(e))
     this.app.use(cors())
     this.app.use(compression())
     this.app.use(morgan('dev'))

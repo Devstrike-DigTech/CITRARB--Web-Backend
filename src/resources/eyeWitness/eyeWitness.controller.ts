@@ -7,6 +7,7 @@ import authenticate from "@/middleware/authenticate.middleware";
 import EyeWitnessService from "./eyeWitness.service";
 import validate from './eyeWitness.validation'
 import RatingController from "../reactionUploads/rating.controller";
+import restrictTo from "@/middleware/restrictTo.middleware";
 
 
 class EyeWitnessController implements Controller {
@@ -26,6 +27,9 @@ class EyeWitnessController implements Controller {
         this.router.post(`${this.path}/`, authenticate, this.upload.any(), validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 
+        this.router.route(`${this.path}/verification`).get(authenticate, restrictTo('admin') ,this.verifyContent)
+        this.router.route(`${this.path}/del`).get(authenticate, restrictTo('admin') ,this.adminDelete)
+
         this.router.get(`${this.path}/:id`, authenticate, this.get)
         this.router.route(`${this.path}/:id`).put(authenticate, this.update)
         this.router.route(`${this.path}/:id`).delete(authenticate,  this.delete)
@@ -39,6 +43,7 @@ class EyeWitnessController implements Controller {
             const images = files.filter((el: any) => el.mimetype.startsWith('image'))
             req.body.images = images
             req.body.videos = videos
+            console.log(req.body)
             const data = await this.service.create(req.body);
 
             res.status(201).json({
@@ -88,6 +93,31 @@ class EyeWitnessController implements Controller {
             res.status(200).json({
                 status: 'success',
                 data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private verifyContent = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.service.verifyContent(req.params.id)
+
+            res.status(200).json({
+                status: 'success',
+                data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private adminDelete = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.service.AdminDelete(req.params.id)
+
+            res.status(204).json({
+                status: 'success',
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))

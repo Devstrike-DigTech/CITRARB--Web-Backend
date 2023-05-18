@@ -22,6 +22,7 @@ class EyeWitnessService {
 
             return eyeWitness
         } catch (error:any) {
+            console.log(error)
             throw new Error(error)
         }
     }
@@ -40,7 +41,7 @@ class EyeWitnessService {
 
     public async getAll(query: any) : Promise<any[]> {
         try {
-            const eyeWitness = eyeWitnessModel.find({active: true});
+            const eyeWitness = eyeWitnessModel.find({active: true}).populate('userId').populate('reactions');
             const features = new Query(eyeWitness, query).filter().sort().limitFields().paginate();
 
             const result = await features.query;
@@ -62,6 +63,33 @@ class EyeWitnessService {
             throw new Error(error)
         }
     }
+
+    public async verifyContent(id: string): Promise<EyeWitness> {
+        try {
+            const data = await eyeWitnessModel.findById(id)
+            let verificationStatus = data?.isVerified
+
+            if(!data) throw new Error("Not found")
+            
+            await eyeWitnessModel.findByIdAndUpdate(id, {isVerified: !verificationStatus}, {new: true, runValidators: true})
+
+            data.isVerified = !verificationStatus
+
+            return data
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async AdminDelete(id: string) : Promise<void> {
+        try {
+            const result = await eyeWitnessModel.findByIdAndDelete(id);
+            if(!result) throw new Error("Not found")
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
 
     /**
      * 

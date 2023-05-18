@@ -46,7 +46,7 @@ class MarketService {
 
     public async getAll(query: any) : Promise<any[]> {
         try {
-            const market = marketModel.find({active: true});
+            const market = marketModel.find({active: true}).populate('userId');
             const features = new Query(market, query).filter().sort().limitFields().paginate();
 
             const result = await features.query;
