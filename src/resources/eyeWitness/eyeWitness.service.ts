@@ -64,6 +64,33 @@ class EyeWitnessService {
         }
     }
 
+    public async verifyContent(id: string): Promise<EyeWitness> {
+        try {
+            const data = await eyeWitnessModel.findById(id)
+            let verificationStatus = data?.isVerified
+
+            if(!data) throw new Error("Not found")
+            
+            await eyeWitnessModel.findByIdAndUpdate(id, {isVerified: !verificationStatus}, {new: true, runValidators: true})
+
+            data.isVerified = !verificationStatus
+
+            return data
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async AdminDelete(id: string) : Promise<void> {
+        try {
+            const result = await eyeWitnessModel.findByIdAndDelete(id);
+            if(!result) throw new Error("Not found")
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+
     /**
      * 
      * @param id 

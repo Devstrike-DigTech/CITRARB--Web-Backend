@@ -21,6 +21,7 @@ class UserController implements Controller {
         this.router.post(`${this.path}/signup`, validationMiddleware(validate.create), this.signup)
         this.router.post(`${this.path}/login`, validationMiddleware(validate.login), this.login)
         this.router.get(`${this.path}/me`, authenticate, this.getMe)
+        this.router.get(`${this.path}/admin`, this.admin)
 
         this.router.route(`${this.path}/:id`).get(authenticate, restrictTo('admin'), this.getUser)
 
@@ -115,6 +116,19 @@ class UserController implements Controller {
             const user = await this.userService.delete(req.user.id)
 
             res.status(204).json({
+                status: 'success',
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private admin = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+
+            const user = await this.userService.users(req.query.year)
+            res.status(200).json({
+                aggregates: user,
                 status: 'success',
             })
         } catch (error:any) {

@@ -9,10 +9,10 @@ class MusicService {
     public async create (data: any): Promise<Music | undefined> {
         try {
 
-            const isMusic = await musicModel.findOne({userId: data.userId});
+            const isMusic = await musicModel.find({userId: data.userId});
 
-            if(isMusic) {
-                throw new Error("You cannot upload more than one music")
+            if(isMusic.length == 3) {
+                throw new Error("You cannot upload more than three music snippet")
             } 
 
             const files = await this.googleDriveAPI.uploadImages(data.file)
@@ -63,6 +63,32 @@ class MusicService {
             if(!result) throw new Error("Not found")
 
             return result
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async verifyContent(id: string): Promise<Music> {
+        try {
+            const data = await musicModel.findById(id)
+            let verificationStatus = data?.isVerified
+
+            if(!data) throw new Error("Not found")
+            
+            await musicModel.findByIdAndUpdate(id, {isVerified: !verificationStatus}, {new: true, runValidators: true})
+
+            data.isVerified = !verificationStatus
+
+            return data
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async AdminDelete(id: string) : Promise<void> {
+        try {
+            const result = await musicModel.findByIdAndDelete(id);
+            if(!result) throw new Error("Not found")
         } catch (error:any) {
             throw new Error(error)
         }

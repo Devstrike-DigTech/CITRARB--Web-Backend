@@ -126,6 +126,102 @@ class UserService {
             throw new Error(error)
         }
     }
+
+    public async users(query: any): Promise<any | Error> {
+        try {
+            let result
+            if(query) {
+                const user = await userModel.aggregate([
+                    {
+                        $project: {
+                            year: {$year: "$createdAt"},
+                            month: { $month: "$createdAt" },
+                        }
+                    },
+                    {
+                        $match: {
+                            year: Number(query)
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: {
+                                month: '$month',
+                            },
+                            count: {$sum: 1},
+                        }
+                    }
+    
+                ])
+    
+                console.log(user)
+                console.log(user.length)
+                let data:any = {}
+                let x = []
+                let y = [] 
+                for(let i = 0; i<11; i++) {
+                    let getMonth = user.find((el: any) => el._id.month == (i+1))
+                    if(getMonth) {
+                        const month = this.getMonthName(getMonth._id.month) 
+                        const count = getMonth.count
+                        x.push(month)
+                        y.push(count)
+                        data.x = x
+                        data.y = y
+                    }
+
+                }
+                result = data
+            }else{
+                const user = await userModel.aggregate([
+                    {
+                        $project: {
+                            year: {$year: "$createdAt"},
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: {
+                                year: '$year',
+                            },
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    }, 
+                    {
+                        $sort: {
+                            '_id.count': 1
+                        }
+                    }
+
+                ])
+                let x: any[] = []
+                let y:any[] = []
+                let data:any = {}
+                user.sort((a:any, b:any) => a._id.year > b._id.year ? 1 : -1)
+                user.forEach((el:any) => {
+                    x.push(el._id.year)
+                    y.push(el.count)
+
+                })
+                data.x = x
+                data.y = y
+                result = data
+            }
+            return result
+        } catch (error:any) {
+            console.log(error)
+            throw new Error(error)
+        }
+    }
+
+    private getMonthName = (monthNumber: number) => {
+        const date = new Date();
+        date.setMonth(monthNumber - 1);
+      
+        return date.toLocaleString('en-US', { month: 'long' });
+      }
 }
 
 export default UserService

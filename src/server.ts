@@ -16,6 +16,8 @@ import EyeWitnessController from './resources/eyeWitness/eyeWitness.controller';
 import ReactionUploadController from './resources/reactionUploads/rating.controller'
 import MusicController from './resources/music/music.controller';
 import ReactionMusicController from './resources/reactionMusic/rating.controller';
+import NewsController from './resources/news/news.controller';
+import YoutubeAPIController from './resources/youtube/youtube.controller';
 
 validateEnv();
 
@@ -32,7 +34,9 @@ const app = new App(
         new EyeWitnessController(),
         new MarketController(),
         new MusicController(),
-        new ReactionMusicController()
+        new ReactionMusicController(),
+        new NewsController(),
+        new YoutubeAPIController()
     ],
     Number(process.env.PORT)
 );
