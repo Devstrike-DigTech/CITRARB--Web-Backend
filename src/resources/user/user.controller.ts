@@ -87,9 +87,11 @@ class UserController implements Controller {
 
     private getMe = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
+            const occupation = await this.occupationService.get(req.user.id)
             res.status(200).json({
                 status: 'success',
-                user: req.user
+                user: req.user,
+                occupation,
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))
