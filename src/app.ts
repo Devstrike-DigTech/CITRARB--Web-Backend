@@ -42,8 +42,12 @@ class App {
   }
 
   private initializeControllers (controllers: Controller[]) {
-    this.app.use(express.static(`${__dirname}/public/`));
-    // this.app.use('/images', express.static(`${path.join(__dirname)}/public/img`));
+    this.app.use('/profile', express.static(`${path.join(__dirname)}/../public/profile`));
+    this.app.use('/events', express.static(`${path.join(__dirname)}/../public/events`));
+    this.app.use('/market', express.static(`${path.join(__dirname)}/../public/market`));
+    this.app.use('/music', express.static(`${path.join(__dirname)}/../public/music`));
+    this.app.use('/uploads', express.static(`${path.join(__dirname)}/../public/uploads`));
+    this.app.use('/hookup', express.static(`${path.join(__dirname)}/../public/hookups`));
     controllers.map((controller: Controller) => {
       this.app.use(`/api`, controller.router)
     })
