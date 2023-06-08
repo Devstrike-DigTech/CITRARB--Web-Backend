@@ -11,6 +11,7 @@ import ErrorMiddleware from '@/middleware/error.middleware'
 import HttpException from './utils/exceptions/httpExceptions'
 import redisClient from '@/utils/cache/connection'
 import * as redis from 'redis';
+import path from 'path'
 
 class App {
   public port: number
@@ -23,6 +24,7 @@ class App {
     this.app = express()
     this.initializeMiddleware()
     this.initializeControllers(controllers)
+    
     this.initializeDB()
     this.initializeErrorHandler()
   }
@@ -40,6 +42,8 @@ class App {
   }
 
   private initializeControllers (controllers: Controller[]) {
+    this.app.use(express.static(`${__dirname}/public/`));
+    // this.app.use('/images', express.static(`${path.join(__dirname)}/public/img`));
     controllers.map((controller: Controller) => {
       this.app.use(`/api`, controller.router)
     })

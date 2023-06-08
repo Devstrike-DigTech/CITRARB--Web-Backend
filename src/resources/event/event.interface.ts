@@ -11,5 +11,6 @@ export default interface Event extends Document {
     description: string,
     numberOfAttendee: number,
     ratingsQuantity: number,
-    eventAttendance: ObjectId[]
+    eventAttendance: ObjectId[],
+    image: string,
 }

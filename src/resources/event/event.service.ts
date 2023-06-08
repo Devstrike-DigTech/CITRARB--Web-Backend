@@ -25,6 +25,7 @@ export default class EventService {
 
             return event
         } catch (error:any) {
+            console.log(error)
             throw new Error((error as any))
         }
     }

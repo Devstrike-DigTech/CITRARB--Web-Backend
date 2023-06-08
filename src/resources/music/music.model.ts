@@ -3,8 +3,7 @@ import Music from "./music.interface";
 
 const musicSchema = new Schema<Music>({
     file: {
-        fileId: String,
-        webContentLink: String
+        type: String
     },
     title: {
         type: String,

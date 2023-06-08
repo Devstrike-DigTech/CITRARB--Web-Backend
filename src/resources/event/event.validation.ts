@@ -5,7 +5,8 @@ const create = Joi.object({
     time: Joi.date().required(),
     location: Joi.string().required(),
     description: Joi.string().min(25).max(250),
-    coHosts: Joi.array().items(Joi.string())
+    coHosts: Joi.array().items(Joi.string()),
+    image: Joi.string(),
 })
 
 const update = Joi.object({

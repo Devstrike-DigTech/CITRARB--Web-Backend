@@ -17,7 +17,7 @@ const login = Joi.object({
 const update = Joi.object({
     photo: Joi.string(),
     username: Joi.string(),
-    phone: Joi.string()
+    phone: Joi.string(),
 })
 
 export default {create, login, update}

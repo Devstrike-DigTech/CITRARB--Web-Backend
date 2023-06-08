@@ -1,24 +1,12 @@
 import EyeWitness from "./eyeWitness.interface";
 import eyeWitnessModel from "./eyeWitness.model";
 import Query from "@/utils/apiFeatures/Query";
-import GoogleDriveAPI from "../shared/uploads/uploads.service";
 
 class EyeWitnessService {
-    private googleDriveAPI = new GoogleDriveAPI();
 
     public async create (data: any): Promise<EyeWitness | undefined> {
         try {
-            const images = await this.googleDriveAPI.uploadImages(data.images)
-            const videos = await this.googleDriveAPI.uploadImages(data.videos)
-            const payload = {
-                videos: videos,
-                title: data.title,
-                description: data.description,
-                location: data.location,
-                images,
-                userId: data.userId
-            }
-            const eyeWitness = await eyeWitnessModel.create(payload)
+            const eyeWitness = await eyeWitnessModel.create(data)
 
             return eyeWitness
         } catch (error:any) {
@@ -111,11 +99,9 @@ class EyeWitnessService {
 
     public async delete(userId: string, id: string) : Promise<void> {
         try {
+
             const result = await eyeWitnessModel.findOneAndDelete({id, userId});
             if(!result) throw new Error("Not found")
-
-            const files = [...result.images, ...result.videos]
-            await this.googleDriveAPI.deleteFile(files)
 
         } catch (error:any) {
             throw new Error(error)

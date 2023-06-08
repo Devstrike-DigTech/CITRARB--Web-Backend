@@ -15,13 +15,7 @@ const marketSchema = new Schema<Market> ({
         type: String,
         // enum: ['Clothing', 'Electronics', 'Others']
     },
-    images: 
-        [
-            {
-                fileId: String,
-                webContentLink: String
-            }
-        ],
+    images: [String],
     description: {
         type: String,
     },

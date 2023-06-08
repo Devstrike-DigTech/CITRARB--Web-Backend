@@ -1,10 +1,8 @@
 import Music from "./music.interface";
 import musicModel from "./music.model";
 import Query from "@/utils/apiFeatures/Query";
-import GoogleDriveAPI from "../shared/uploads/uploads.service";
 
 class MusicService {
-    private googleDriveAPI = new GoogleDriveAPI();
 
     public async create (data: any): Promise<Music | undefined> {
         try {
@@ -15,11 +13,10 @@ class MusicService {
                 throw new Error("You cannot upload more than three music snippet")
             } 
 
-            const files = await this.googleDriveAPI.uploadImages(data.file)
             const payload = {
                 title: data.title,
                 description: data.description,
-                file: files[0],
+                file: data.file,
                 userId: data.userId
             }
             const music = await musicModel.create(payload)
@@ -118,7 +115,6 @@ class MusicService {
             if(!result) throw new Error("Not found")
 
             const files = [result.file]
-            await this.googleDriveAPI.deleteFile(files)
 
         } catch (error:any) {
             throw new Error(error)

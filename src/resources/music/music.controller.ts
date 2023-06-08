@@ -14,7 +14,33 @@ class MusicController implements Controller {
     public path = '/music'
     public router = Router()
 
-    private multerStorage = multer.memoryStorage();
+    private multerStorage = multer.diskStorage({
+        filename(req, file, callback) {
+            const filename = `music--${Date.now()}${Math.ceil(Math.random() * 10000)}.mp3`;
+            req.body.file = filename
+            callback(null, filename)
+        },
+        destination(req, file, callback) {
+            callback(null, `public/music`)
+        },
+    })
+
+    private multerFilter = (req:any, file:any, cb:any) => {
+        if (file.mimetype.startsWith('audio')) {
+            cb(null, true);
+        } else {
+            cb(new HttpException('Not an audio! Please upload only audio files.', 400), false);
+        }
+        };
+    
+        private upload = multer({
+        storage: this.multerStorage,
+        fileFilter: this.multerFilter
+        });
+    
+        private uploadMusic = this.upload.fields([
+        { name: 'file', maxCount: 1 }
+        ]);
 
     constructor(){
         this.initializeRouter()
@@ -23,7 +49,7 @@ class MusicController implements Controller {
     private initializeRouter(){
         this.router.use(`${this.path}/:musicId/reactions`, new RatingController().router)
 
-        this.router.post(`${this.path}/`, authenticate, this.upload.single('file'), validationMiddleware(validate.create), this.create)
+        this.router.post(`${this.path}/`, authenticate, this.uploadMusic, validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 
         this.router.route(`${this.path}/verification`).get(authenticate, restrictTo('admin') ,this.verifyContent)
@@ -37,7 +63,6 @@ class MusicController implements Controller {
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             req.body.userId = req.user.id
-            req.body.file = [req.file as Express.Multer.File]
 
             console.log(req.body)
             const data = await this.service.create(req.body);
@@ -45,7 +70,6 @@ class MusicController implements Controller {
             res.status(201).json({
                 status: 'success',
                 data,
-                // data: "lk",
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))
@@ -132,19 +156,6 @@ class MusicController implements Controller {
             next(new HttpException(error.message, error.statusCode))
         }
     }
-
-    private multerFilter = (req: any, file: any, cb: any) => {
-        if (file.mimetype.startsWith('audio')) {
-          cb(null, true);
-        } else {
-          cb(new HttpException('Not an audio! Please upload only audio file.', 400), false);
-        }
-      };
-
-    private upload = multer({
-        storage: this.multerStorage,
-        fileFilter: this.multerFilter,
-      });
 
 }
 

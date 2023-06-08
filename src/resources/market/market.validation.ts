@@ -7,6 +7,7 @@ const create = Joi.object({
     category: Joi.string().required(),
     description: Joi.string().min(25).max(350),
     price: Joi.number().required(),
+    images: Joi.array().items(Joi.string())
 })
 
 const update = Joi.object({

@@ -6,12 +6,35 @@ import validationMiddleware from "@/middleware/validation.middleware";
 import validate from './user.validation'
 import authenticate from "@/middleware/authenticate.middleware";
 import restrictTo from "@/middleware/restrictTo.middleware";
+import multer from "multer";
+import sharp from "sharp";
+import OccupationService from "../occupation/occupation.service";
 
 class UserController implements Controller {
     public path = '/users'
     public router = Router()
 
     private userService = new UserService()
+    private occupationService = new OccupationService()
+
+    private multerStorage = multer.memoryStorage();
+
+    private multerFilter = (req:any, file:any, cb:any) => {
+        if (file.mimetype.startsWith('image')) {
+            cb(null, true);
+        } else {
+            cb(new HttpException('Not an image! Please upload only images.', 400), false);
+        }
+    };
+
+    private upload = multer({
+        storage: this.multerStorage,
+        fileFilter: this.multerFilter,
+    });
+
+    private uploadImage = this.upload.fields([
+        { name: 'photo', maxCount: 1 }
+    ]);
 
     constructor(){
         this.initializeRouter()
@@ -27,7 +50,7 @@ class UserController implements Controller {
 
         this.router.route(`${this.path}/`).get(authenticate, this.getMembers)
 
-        this.router.route(`${this.path}/`).put(authenticate, this.updateMe)
+        this.router.route(`${this.path}/`).put(authenticate, this.uploadImage, this.resizeUserPhoto, this.updateMe)
 
         this.router.route(`${this.path}/`).delete(authenticate, this.deleteMe)
     }
@@ -49,11 +72,13 @@ class UserController implements Controller {
     private login = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             const {user, token}:any = await this.userService.login(req.body.email, req.body.password)
+            const occupation = await this.occupationService.get(user.id)
 
             res.status(200).json({
                 status: 'success',
                 token,
-                user,
+                user: user,
+                occupation,
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))
@@ -135,6 +160,22 @@ class UserController implements Controller {
             next(new HttpException(error.message, error.statusCode))
         }
     }
+
+    private resizeUserPhoto = async (req: Request, res: Response, next: NextFunction) => {
+        if (!req.files) return next();
+
+        // 1) profile picture
+        if ((req.files as any).photo) {
+          req.body.photo = `profile-${req.user.id}-${Date.now()}-.jpeg`;
+          await sharp((req.files as any).photo[0].buffer)
+            .resize(2000, 1333)
+            .toFormat('jpeg')
+            .jpeg({ quality: 90 })
+            .toFile(`public/profile/${req.body.photo}`);
+        }
+      
+        next();
+      };
 }
 
 export default UserController

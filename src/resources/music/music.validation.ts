@@ -3,6 +3,7 @@ import Joi from "joi";
 const create = Joi.object({
     description: Joi.string().min(25).max(350),
     title: Joi.string().required(),
+    file: Joi.string()
 })
 
 const update = Joi.object({
