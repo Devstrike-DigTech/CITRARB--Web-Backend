@@ -42,12 +42,13 @@ class App {
   }
 
   private initializeControllers (controllers: Controller[]) {
-    this.app.use('/profile', express.static(`${path.join(__dirname)}/../public/profile`));
-    this.app.use('/events', express.static(`${path.join(__dirname)}/../public/events`));
-    this.app.use('/market', express.static(`${path.join(__dirname)}/../public/market`));
-    this.app.use('/music', express.static(`${path.join(__dirname)}/../public/music`));
-    this.app.use('/uploads', express.static(`${path.join(__dirname)}/../public/uploads`));
-    this.app.use('/hookup', express.static(`${path.join(__dirname)}/../public/hookups`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/profile`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/events`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/market`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/music`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/uploads/images`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/uploads/videos`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/hookups`));
     controllers.map((controller: Controller) => {
       this.app.use(`/api`, controller.router)
     })
