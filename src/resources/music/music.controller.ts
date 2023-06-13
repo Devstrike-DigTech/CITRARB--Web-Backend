@@ -14,33 +14,42 @@ class MusicController implements Controller {
     public path = '/music'
     public router = Router()
 
+
     private multerStorage = multer.diskStorage({
         filename(req, file, callback) {
-            const filename = `music--${Date.now()}${Math.ceil(Math.random() * 10000)}.mp3`;
-            req.body.file = filename
+            let filename;
+            
+            if(file.mimetype.startsWith('audio')) {
+                filename = `music--${Date.now()}${Math.ceil(Math.random() * 10000)}.mp3`
+            }else {
+                filename = `music-cover--${Date.now()}${Math.ceil(Math.random() * 10000)}.jpeg`
+            }
+
             callback(null, filename)
         },
         destination(req, file, callback) {
-            callback(null, `public/music`)
+            const url = file.mimetype.startsWith('audio') ? 'public/music/audios' : 'public/music/images'
+            callback(null, url)
         },
     })
-
+    
     private multerFilter = (req:any, file:any, cb:any) => {
-        if (file.mimetype.startsWith('audio')) {
+        if (file.mimetype.startsWith('image') || file.mimetype.startsWith('audio')) {
             cb(null, true);
         } else {
-            cb(new HttpException('Not an audio! Please upload only audio files.', 400), false);
+            cb(new HttpException('file has to be an image or video.', 400), false);
         }
-        };
-    
-        private upload = multer({
+    };
+
+    private upload = multer({
         storage: this.multerStorage,
         fileFilter: this.multerFilter
-        });
+    });
     
-        private uploadMusic = this.upload.fields([
-        { name: 'file', maxCount: 1 }
-        ]);
+    private uploadMusic = this.upload.fields([
+        { name: 'file', maxCount: 1 },
+        { name: 'image', maxCount: 1 }
+    ]);
 
     constructor(){
         this.initializeRouter()
@@ -49,7 +58,7 @@ class MusicController implements Controller {
     private initializeRouter(){
         this.router.use(`${this.path}/:musicId/reactions`, new RatingController().router)
 
-        this.router.post(`${this.path}/`, authenticate, this.uploadMusic, validationMiddleware(validate.create), this.create)
+        this.router.post(`${this.path}/`, authenticate, this.uploadMusic, this.middle, validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 
         this.router.route(`${this.path}/verification`).get(authenticate, restrictTo('admin') ,this.verifyContent)
@@ -75,6 +84,15 @@ class MusicController implements Controller {
             next(new HttpException(error.message, error.statusCode))
         }
     }
+
+    private middle = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        if(!req.files) next();
+        const files = req.files
+        if((files as any).image) req.body.image = (files as any).image[0].filename
+        if((files as any).file) req.body.file = (files as any).file[0].filename
+
+        next()
+}
 
     private get = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {

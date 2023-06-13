@@ -17,6 +17,7 @@ class MusicService {
                 title: data.title,
                 description: data.description,
                 file: data.file,
+                image: data.image,
                 userId: data.userId
             }
             const music = await musicModel.create(payload)

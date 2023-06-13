@@ -17,13 +17,15 @@ class UserService {
      */
     public async create (user: User): Promise<AuthCredentials | Error> {
         try {
+            const isUsername = await this.UserModel.findOne({username: user.username})
+            if(isUsername) throw new HttpException("Username already exist", 404)
             const newUser = await this.UserModel.create(user)
 
             const token = createToken(newUser)
 
             return {token, user: newUser}
         } catch (error:any) {
-            throw new Error(error)
+            throw new HttpException(error.message, error.statusCode)
         }
     }
 

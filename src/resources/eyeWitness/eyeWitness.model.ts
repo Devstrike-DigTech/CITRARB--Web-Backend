@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import EyeWitness from "./eyeWitness.interface";
 
 const eyeWitnessSchema = new Schema<EyeWitness>({
-    videos: String,
+    video: String,
     images: [String],
     location: {
         type: String,

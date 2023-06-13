@@ -26,7 +26,6 @@ class EyeWitnessController implements Controller {
                 filename = `upload-image--${Date.now()}${Math.ceil(Math.random() * 10000)}.jpeg`
             }
 
-            console.log(filename, 'from filenae')
             callback(null, filename)
         },
         destination(req, file, callback) {
@@ -75,6 +74,7 @@ class EyeWitnessController implements Controller {
         try {
             req.body.userId = req.user.id
             const data = await this.service.create(req.body);
+            console.log(req.body)
 
             res.status(201).json({
                 status: 'success',
@@ -89,7 +89,8 @@ class EyeWitnessController implements Controller {
             if(!req.files) next();
             const files = req.files
             if((files as any).images) req.body.images = (files as any).images.map((el:any) => el.filename)
-            if((files as any).video) req.body.video = (files as any).video.filename
+            if((files as any).video) req.body.video = (files as any).video[0].filename
+
             next()
     }
 

@@ -44,8 +44,9 @@ class App {
   private initializeControllers (controllers: Controller[]) {
     this.app.use('/', express.static(`${path.join(__dirname)}/../public/profile`));
     this.app.use('/', express.static(`${path.join(__dirname)}/../public/events`));
-    this.app.use('/', express.static(`${path.join(__dirname)}/../public/market`));
-    this.app.use('/', express.static(`${path.join(__dirname)}/../public/music`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/products`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/music/audios`));
+    this.app.use('/', express.static(`${path.join(__dirname)}/../public/music/images`));
     this.app.use('/', express.static(`${path.join(__dirname)}/../public/uploads/images`));
     this.app.use('/', express.static(`${path.join(__dirname)}/../public/uploads/videos`));
     this.app.use('/', express.static(`${path.join(__dirname)}/../public/hookups`));

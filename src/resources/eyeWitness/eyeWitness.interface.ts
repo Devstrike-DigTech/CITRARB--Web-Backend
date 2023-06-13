@@ -2,7 +2,7 @@ import { Document, ObjectId } from "mongoose";
 
 
 export default interface EyeWitness extends Document {
-    videos: string,
+    video: string,
     images: string[],
     userId: ObjectId,
     location: string,

@@ -26,6 +26,9 @@ const musicSchema = new Schema<Music>({
     },
     avgRating: {
         type: Number
+    },
+    image: {
+        type: String
     }
 },
 {

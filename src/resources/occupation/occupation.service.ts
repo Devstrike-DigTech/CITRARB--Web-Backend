@@ -25,11 +25,11 @@ class OccupationService {
      * @param id - user id  
      * @returns 
      */
-    public async get(id: string): Promise<Occupation | any[] | Error> {
+    public async get(id: string): Promise<Occupation | any | Error> {
         try {
             const occupation = await this.OccupationModel.findOne({userId: id});
 
-            return occupation || []
+            return occupation || {}
 
         } catch (error:any) {
             throw new Error(error)

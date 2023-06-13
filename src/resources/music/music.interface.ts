@@ -12,5 +12,6 @@ export default interface Music extends Document {
     description: string,
     isVerified: boolean,
     avgRating: number,
-    ratingsQuantity: number
+    ratingsQuantity: number,
+    image: string
 }
