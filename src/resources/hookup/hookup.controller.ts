@@ -49,7 +49,7 @@ class HookupController implements Controller {
 
     private initializeRouter(){
 
-        this.router.route(`${this.path}/`).post(authenticate, RestrictTo('admin'), validationMiddleware(validate.submit), this.create)
+        this.router.route(`${this.path}/`).post(authenticate, RestrictTo('admin'), validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/today`).get(authenticate, this.getToday)
         this.router.route(`${this.path}/:id/submit`).patch(authenticate, this.uploadImage ,this.submitPhoto)
         this.router.route(`${this.path}/:id`).patch(authenticate, RestrictTo('admin'), validationMiddleware(validate.update), this.updateWinner)
