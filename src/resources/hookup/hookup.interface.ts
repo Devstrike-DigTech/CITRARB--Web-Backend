@@ -2,6 +2,7 @@ export default interface Hookup {
     date: Date,
     gender: string,
     images: participants[],
+    status: string,
 }
 
 interface participants {

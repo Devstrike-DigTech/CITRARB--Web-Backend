@@ -11,8 +11,8 @@ export default class HookupService {
      */
     public async create (gender: string) {
         try {
-            const isToday = await this.getToday()
-            if(isToday) throw new Error('Already ongoing today')
+            const isToday = await this.getActive(gender)
+            if(isToday) throw new Error(`Already ongoing contest for ${gender}`)
             const hookup = await hookupModel.create({gender})
 
             return hookup
@@ -33,10 +33,11 @@ export default class HookupService {
         }
     }
 
-    public async getToday() {
+    public async getActive(gender:string) {
         try {
-            const today = moment().startOf('day')
-            const hookup = await hookupModel.findOne({date: {$gte: today.toDate(), $lte: moment(today).endOf('day').toDate()} }).populate({ path: "images.id", model: "User", select: "username email photo" })
+            // const today = moment().startOf('day')
+            // const hookup = await hookupModel.findOne({date: {$gte: today.toDate(), $lte: moment(today).endOf('day').toDate()} }).populate({ path: "images.id", model: "User", select: "username email photo" })
+            const hookup = await hookupModel.findOne({status: "active", gender }).populate({ path: "images.id", model: "User", select: "username email photo" })
 
             // if(!hookup) throw new HttpException('not found', 404)
             return hookup
@@ -73,7 +74,7 @@ export default class HookupService {
         }
     }
 
-    public async update (id: string, winner: string) {
+    public async setWinner (id: string, winner: string) {
         try {
             const hookup = await hookupModel.findById(id)
 
@@ -88,6 +89,15 @@ export default class HookupService {
 
             await hookup?.save()
             
+            return hookup
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async updateStatusHookup (id: string, status: string) {
+        try {
+            const hookup = await hookupModel.findByIdAndUpdate(id, {status}, {runValidators: true, new: true})
             return hookup
         } catch (error:any) {
             throw new Error(error)

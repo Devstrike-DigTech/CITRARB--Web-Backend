@@ -50,9 +50,10 @@ class HookupController implements Controller {
     private initializeRouter(){
 
         this.router.route(`${this.path}/`).post(authenticate, RestrictTo('admin'), validationMiddleware(validate.create), this.create)
-        this.router.route(`${this.path}/today`).get(authenticate, this.getToday)
+        this.router.route(`${this.path}/active`).get(authenticate, this.getActive)
         this.router.route(`${this.path}/:id/submit`).patch(authenticate, this.uploadImage ,this.submitPhoto)
         this.router.route(`${this.path}/:id`).patch(authenticate, RestrictTo('admin'), validationMiddleware(validate.update), this.updateWinner)
+        this.router.route(`${this.path}/:id`).put(authenticate, RestrictTo('admin'), validationMiddleware(validate.setStatus), this.setStatus)
     }
 
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -68,9 +69,10 @@ class HookupController implements Controller {
         }
     }
 
-    private getToday = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    private getActive = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
-            const data = await this.service.getToday();
+            const query = req.query.gender || 'male'
+            const data = await this.service.getActive((query as string));
 
             res.status(201).json({
                 status: 'success',
@@ -96,7 +98,20 @@ class HookupController implements Controller {
 
     private updateWinner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
-            const data = await this.service.update(req.params.id, req.body.user);
+            const data = await this.service.setWinner(req.params.id, req.body.user);
+
+            res.status(201).json({
+                status: 'success',
+                data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private setStatus = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.service.updateStatusHookup(req.params.id, req.body.status);
 
             res.status(201).json({
                 status: 'success',

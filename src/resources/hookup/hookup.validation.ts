@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const create = Joi.object({
-    gender: Joi.string().required(),
+    gender: Joi.string().valid("male", "female").required(),
 })
 
 const submit = Joi.object({
@@ -12,4 +12,8 @@ const update = Joi.object({
     user: Joi.string().required(),
 })
 
-export default {create, submit, update}
+const setStatus = Joi.object({
+    status: Joi.string().valid("active","inactive").required(),
+})
+
+export default {create, submit, update, setStatus}

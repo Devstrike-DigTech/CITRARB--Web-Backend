@@ -19,7 +19,11 @@ const hookupSchema = new Schema<Hookup> ({
     gender: {
         type: String,
         enum: ['male', 'female']
-    }
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive']
+    },
 })
 
 export default model("Hookup", hookupSchema)
