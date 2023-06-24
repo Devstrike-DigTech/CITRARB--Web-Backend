@@ -22,7 +22,8 @@ const hookupSchema = new Schema<Hookup> ({
     },
     status: {
         type: String,
-        enum: ['active', 'inactive']
+        enum: ['active', 'inactive'],
+        default: 'active'
     },
 })
 
