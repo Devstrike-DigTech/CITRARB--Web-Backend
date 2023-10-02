@@ -36,7 +36,8 @@ const userSchema = new Schema<User> ({
         type: String,
         enum: ['male', 'female']
     },
-    phone: String
+    phone: String,
+    location: String,
 }, {
     toJSON: {
         transform: function (doc, ret) {

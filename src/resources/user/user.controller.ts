@@ -43,10 +43,12 @@ class UserController implements Controller {
     private initializeRouter(){
         this.router.post(`${this.path}/signup`, validationMiddleware(validate.create), this.signup)
         this.router.post(`${this.path}/login`, validationMiddleware(validate.login), this.login)
+        this.router.get(`${this.path}/logout`, authenticate, this.logout)
         this.router.get(`${this.path}/me`, authenticate, this.getMe)
         this.router.get(`${this.path}/admin`, this.admin)
 
         this.router.route(`${this.path}/:id`).get(authenticate, restrictTo('admin'), this.getUser)
+        this.router.route(`${this.path}/aggregate/:id`).get(authenticate, restrictTo('admin'), this.userAgg)
 
         this.router.route(`${this.path}/`).get(authenticate, this.getMembers)
 
@@ -79,6 +81,19 @@ class UserController implements Controller {
                 token,
                 user: user,
                 occupation,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            console.log(req.user)
+            await this.userService.logout(req.user)
+
+            res.status(200).json({
+                status: 'success',
             })
         } catch (error:any) {
             next(new HttpException(error.message, error.statusCode))
@@ -156,6 +171,19 @@ class UserController implements Controller {
             const user = await this.userService.users(req.query.year)
             res.status(200).json({
                 aggregates: user,
+                status: 'success',
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private userAgg = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+
+            const aggregates = await this.userService.userAggregates(req.params.id)
+            res.status(200).json({
+                aggregates,
                 status: 'success',
             })
         } catch (error:any) {

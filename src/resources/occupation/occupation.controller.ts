@@ -31,7 +31,7 @@ class OccupationController implements Controller {
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             req.body.userId = req.user.id
-            const data = await this.occupationService.create(req.body);
+            const data = await this.occupationService.create(req.body, req.user.id);
 
             res.status(201).json({
                 status: 'success',

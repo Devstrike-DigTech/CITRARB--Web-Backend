@@ -1,11 +1,18 @@
 import marketModel from "./market.model";
 import Market from "./market.interface";
 import Query from "@/utils/apiFeatures/Query";
+import userModel from "../user/user.model";
+import HttpException from "@/utils/exceptions/httpExceptions";
 
 
 class MarketService {
     public async create (data: any): Promise<Market | undefined> {
         try {
+            const user = await userModel.findById(data.userId);
+
+            if (user && !user.phone) {
+                throw new HttpException("You do not have a phone in your profile", 400)
+            }
             const marketPayload = {
                 name: data.name,
                 description: data.description,
@@ -42,6 +49,15 @@ class MarketService {
             const result = await features.query;
 
             return result
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async getUserMarket(id: string): Promise <any[]> {
+        try {
+            const res = await marketModel.find({userId: id})
+            return res
         } catch (error:any) {
             throw new Error(error)
         }

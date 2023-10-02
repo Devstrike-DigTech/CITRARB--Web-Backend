@@ -4,6 +4,10 @@ import AuthCredentials from "@/utils/interfaces/authCredential.interface";
 import {createToken} from '@/utils/token'
 import HttpException from "@/utils/exceptions/httpExceptions";
 import FriendService from "../friend/friend.service";
+import MusicService from "../music/music.service";
+import EventAttendanceService from "../eventAttendance/eventAttendance.service";
+import EyeWitnessService from "../eyeWitness/eyeWitness.service";
+import MarketService from "../market/market.service";
 
 class UserService {
     private UserModel = userModel
@@ -51,6 +55,16 @@ class UserService {
         }
     }
 
+    public async logout(user: User): Promise<AuthCredentials | Error> {
+        try {
+            const token = createToken(user, '1s')
+
+            return {token, user}
+        } catch (error:any) {
+            throw new HttpException(error.message, error.statusCode)
+        }
+    }
+
     /**
      * 
      * @param id - user id to fetch
@@ -83,6 +97,26 @@ class UserService {
 
             return members
 
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async userAggregates(userId: string): Promise<any | Error> {
+        try {
+            const music = await new MusicService().getUserMusic(userId);
+            const eyeWitness = await new EyeWitnessService().getUserUpload(userId)
+            const event = await new EventAttendanceService().getAll(userId)
+            const friend = await new FriendService().getAll(userId)
+            const market = await new MarketService().getUserMarket(userId)
+
+            return {
+                music: music.length,
+                eyeWitness: eyeWitness.length,
+                event: event.length,
+                friend: friend.length,
+                market: market.length
+            }
         } catch (error:any) {
             throw new Error(error)
         }
@@ -224,6 +258,8 @@ class UserService {
       
         return date.toLocaleString('en-US', { month: 'long' });
       }
+
+    
 }
 
 export default UserService

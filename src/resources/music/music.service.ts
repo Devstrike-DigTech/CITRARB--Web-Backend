@@ -92,6 +92,16 @@ class MusicService {
         }
     }
 
+    public async getUserMusic(userId: string): Promise<any[]> {
+        try {
+            const res = await musicModel.find({userId})
+
+            return res
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
     /**
      * 
      * @param id 

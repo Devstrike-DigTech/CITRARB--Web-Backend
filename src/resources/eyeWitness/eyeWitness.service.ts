@@ -78,6 +78,16 @@ class EyeWitnessService {
         }
     }
 
+    public async getUserUpload(userId: string): Promise<any[]> {
+        try {
+            const res = await eyeWitnessModel.find({userId})
+
+            return res
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
 
     /**
      * 
