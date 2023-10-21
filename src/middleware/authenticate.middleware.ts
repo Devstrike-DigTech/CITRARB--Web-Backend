@@ -6,6 +6,7 @@ import userModel from '@/resources/user/user.model'
 import HttpException from '@/utils/exceptions/httpExceptions'
 
 async function authenticate (req:Request, res:Response, next:NextFunction): Promise<Response | void> {
+    console.log(req.body)
     const bearer = req.headers.authorization
 
     if(!bearer || !bearer.startsWith('Bearer')){

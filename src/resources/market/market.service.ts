@@ -11,7 +11,7 @@ class MarketService {
             const user = await userModel.findById(data.userId);
 
             if (user && !user.phone) {
-                throw new HttpException("You do not have a phone in your profile", 400)
+                throw new HttpException("You do not have a phone in your profile for contact", 400)
             }
             const marketPayload = {
                 name: data.name,

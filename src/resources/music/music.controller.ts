@@ -86,6 +86,7 @@ class MusicController implements Controller {
     }
 
     private middle = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        console.log(req.body)
         if(!req.files) next();
         const files = req.files
         if((files as any).image) req.body.image = (files as any).image[0].filename

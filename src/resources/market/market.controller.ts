@@ -18,6 +18,7 @@ class MarketController implements Controller {
     private multerStorage = multer.memoryStorage();
 
     private multerFilter = (req:any, file:any, cb:any) => {
+        console.log('reach')
     if (file.mimetype.startsWith('image')) {
         cb(null, true);
     } else {
@@ -119,32 +120,41 @@ class MarketController implements Controller {
         }
     }
 
-    private resizeImages =  async(req: Request, res: Response, next: NextFunction) => {
+    private resizeImages = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            if (!req.files) return next();
-            const files = req.files as any
-
-            req.body.images = []
+            if (!req.files || !('images' in req.files)) {
+                // If there are no uploaded images, move to the next middleware
+                return next();
+            }
+    
+            const images = (req.files as { images: Express.Multer.File[] }).images;
+    
+            // Initialize req.body as an object with an 'images' property
+            (req.body as { images: string[] }).images = [];
+    
             await Promise.all(
-            files.images.map(async (file:any, i:number) => {
-              const filename = `product--${Date.now()}-${i + 1}.jpeg`;
-              console.log(filename)
-        
-              await sharp(file.buffer)
-                .resize(2000, 1333)
-                .toFormat('jpeg')
-                .jpeg({ quality: 90 })
-                .toFile(`public/products/${filename}`);
-        
-              
-             req.body.images.push(filename);
-            })
-        )
-        next()
-        } catch (error:any) {
-            next(new HttpException(error.message, error.statusCode))
+                images.map(async (image: Express.Multer.File, i: number) => {
+                    const filename = `product--${Date.now()}-${i + 1}.jpeg`;
+    
+                    await sharp(image.buffer)
+                        .resize(2000, 1333)
+                        .toFormat('jpeg')
+                        .jpeg({ quality: 90 })
+                        .toFile(`public/products/${filename}`);
+    
+                    // Push the filenames to req.body.images
+                    (req.body as { images: string[] }).images.push(filename);
+                })
+            );
+    
+            next();
+        } catch (error: any) {
+            next(new HttpException(error.message, error.statusCode));
         }
-    }
+    };
+    
+    
+    
 }
 
 export default MarketController

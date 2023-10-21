@@ -19,6 +19,7 @@ class EyeWitnessController implements Controller {
     private multerStorage = multer.diskStorage({
         filename(req, file, callback) {
             let filename;
+
             
             if(file.mimetype.startsWith('video')) {
                 filename = `upload-video--${Date.now()}${Math.ceil(Math.random() * 10000)}.mp4`
@@ -45,6 +46,7 @@ class EyeWitnessController implements Controller {
     private upload = multer({
         storage: this.multerStorage,
         fileFilter: this.multerFilter,
+        limits: {fileSize: 50 * 1024 * 1024}
     });
 
     private uploadFile = this.upload.fields([
@@ -73,8 +75,8 @@ class EyeWitnessController implements Controller {
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             req.body.userId = req.user.id
+
             const data = await this.service.create(req.body);
-            console.log(req.body)
 
             res.status(201).json({
                 status: 'success',

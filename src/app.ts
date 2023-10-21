@@ -31,12 +31,18 @@ class App {
 
   private initializeMiddleware () {
     redisClient(redis).then((res:any) => App.redisClient = res).catch((e) => console.log(e))
+    const corsOptions = {
+      origin: '*', // Replace with the origin of your React app
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true, // Allow cookies and authorization headers
+    };
+    
     this.app.use(cors())
     this.app.use(compression())
     this.app.use(morgan('dev'))
     this.app.use(helmet())
     this.app.use(cookieParser())
-    this.app.use(bodyParser.json())
+    this.app.use(express.json())
     this.app.use(bodyParser.urlencoded({ extended: true }))
 
   }

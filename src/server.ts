@@ -19,6 +19,7 @@ import ReactionMusicController from './resources/reactionMusic/rating.controller
 import NewsController from './resources/news/news.controller';
 import YoutubeAPIController from './resources/youtube/youtube.controller';
 import HookupController from './resources/hookup/hookup.controller'
+import SystemController from './resources/system/system.controller';
 
 validateEnv();
 
@@ -38,7 +39,8 @@ const app = new App(
         new ReactionMusicController(),
         new NewsController(),
         new YoutubeAPIController(),
-        new HookupController()
+        new HookupController(),
+        new SystemController()
     ],
     Number(process.env.PORT)
 );
