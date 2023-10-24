@@ -173,6 +173,19 @@ export default class HookupService {
                         "images.isWinner": true,
                         "gender": gender
                     }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        startDate: 1,
+                        gender: 1,
+                        status: 1,
+                        image: "$images.image",
+                        userId: "$user._id",
+                        username: "$user.username",
+                        email: "$user.email",
+                        phone: "$user.phone"
+                    }
                 }
             ])
             return doc

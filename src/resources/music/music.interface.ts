@@ -14,4 +14,5 @@ export default interface Music extends Document {
     avgRating: number,
     ratingsQuantity: number,
     image: string
+    genre: string
 }
