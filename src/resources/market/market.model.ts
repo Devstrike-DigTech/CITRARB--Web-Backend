@@ -23,6 +23,10 @@ const marketSchema = new Schema<Market> ({
         type: Boolean,
         default: true,
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User",

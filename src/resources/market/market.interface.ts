@@ -13,4 +13,5 @@ export default interface Market extends Document {
     price: number,
     category: string,
     active: Boolean,
+    isVerified: Boolean
 }

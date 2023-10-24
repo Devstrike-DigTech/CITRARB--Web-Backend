@@ -35,20 +35,17 @@ export default class HookupService {
 
     public async getActive(gender:string) {
         try {
-            // const today = moment().startOf('day')
-            // const hookup = await hookupModel.findOne({date: {$gte: today.toDate(), $lte: moment(today).endOf('day').toDate()} }).populate({ path: "images.id", model: "User", select: "username email photo" })
-            const hookup = await hookupModel.findOne({status: "active", gender }).populate({ path: "images.id", model: "User", select: "username email photo" })
+            const hookup = await hookupModel.findOne({status: "active", gender }).populate({ path: "images.userId", model: "User", select: "username email photo" })
 
-            // if(!hookup) throw new HttpException('not found', 404)
             return hookup
         } catch (error:any) {
             throw new Error(error)
         }
     }
 
-    public async getAll () {
+    public async getAll (query: any) {
         try {
-            const hookups = await hookupModel.find({})
+            const hookups = await hookupModel.find(query).populate({ path: "images.userId", model: "User", select: "username email photo" })
 
             return hookups;
         } catch (error:any) {
@@ -60,13 +57,19 @@ export default class HookupService {
         try {
             const hookup = await this.get(id)
 
+            if(!hookup) throw new HttpException("not found", 404)
+
+            if(hookup.status == "inactive") throw new HttpException("hookup inactive", 404)
+
             if(hookup.images.length >= 20) throw new Error("Maximum reached..Wait till the next one")
 
-            const userAlreadySubmitted = hookup.images.filter((el:any) => el.id == userId)
+            const userAlreadySubmitted = hookup.images.filter((el:any) => el.userId == userId)
 
-            if(userAlreadySubmitted) throw new Error("You have already submitted your photo for today")
+            console.log(userAlreadySubmitted)
 
-            const newHookup = await hookupModel.findByIdAndUpdate(id, {$push: {images: [{id: userId, image}]}}, {new: true, runValidators: true})
+            if(userAlreadySubmitted.length > 0) throw new HttpException("You have already submitted your photo for today", 400)
+
+            const newHookup = await hookupModel.findByIdAndUpdate(id, {$push: {images: [{userId, image}]}}, {new: true, runValidators: true})
             
             return newHookup
         } catch (error:any) {
@@ -81,7 +84,7 @@ export default class HookupService {
             if(!hookup) throw new HttpException('not found', 404)
             
             let newArr = hookup.images.map((el:any) => {
-                return el.id == winner ? {...el, isWinner: true} : {...el, isWinner: false}
+                return el.userId == winner ? {...el, isWinner: true} : {...el, isWinner: false}
                 
             })
 
@@ -110,8 +113,71 @@ export default class HookupService {
 
             if(!data) throw new HttpException('not found', 404)
         } catch (error:any) {
-            throw new Error(error)
+            throw new HttpException(error.message, error.statusCode)
         }
        
+    }
+
+    public async getLastWinners() {
+        try {
+
+            let winnerMale = await hookupModel.find({gender: "male"}).sort({_id:-1}).limit(1).populate({ path: "images.userId", model: "User"});
+            let male
+            let female
+
+            if (winnerMale.length > 0) {
+                male = winnerMale[0].images.find((el: any) => el.isWinner == true)
+                console.log(male)
+            }
+
+            let winnerFemale = await hookupModel.find({gender: "female"}).sort({_id:-1}).limit(1).populate({ path: "images.userId", model: "User"});
+            if (winnerFemale.length > 0) {
+                female = winnerFemale[0].images.find((el: any) => el.isWinner == true)
+                console.log(female)
+            }
+
+            return {
+                male: male || null,
+                female: female || null,
+            }
+        } catch (error:any) {
+            throw new HttpException(error.message, error.statusCode)
+        }
+
+    }
+    public async getAllWinners(gender: string){
+        try {
+            const doc = await hookupModel.aggregate([
+                {
+                    $unwind: "$images"
+                },
+                {
+                    $lookup: {
+                        as: 'user',
+                        from: 'users',
+                        let: { userId: { $toObjectId: "$images.userId" } },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: { $eq: ["$_id", "$$userId"] }
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    $unwind: "$user"
+                },
+                {
+                    $match: {
+                        "images.isWinner": true,
+                        "gender": gender
+                    }
+                }
+            ])
+            return doc
+        } catch (error:any) {
+            throw new HttpException(error.message, error.statusCode)
+        }
     }
 }

@@ -6,7 +6,7 @@ const create = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
     confirmPassword: Joi.string().min(8).required(),
-    phone: Joi.string(),
+    phone: Joi.string().required(),
     location: Joi.string(),
     gender: Joi.string().valid("male", "female").insensitive(),
 })

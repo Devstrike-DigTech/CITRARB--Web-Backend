@@ -3,13 +3,15 @@ import Hookup from "./hookup.interface";
 
 
 const hookupSchema = new Schema<Hookup> ({
-    date: {
+    startDate: {
         type: Date,
-        required: [true, 'enter a date'],
         default: new Date()
     },
+    endDate: {
+        type: Date,
+    },
     images: [{
-        id: String,
+        userId: String,
         image: String,
         isWinner: {
             type: Boolean,

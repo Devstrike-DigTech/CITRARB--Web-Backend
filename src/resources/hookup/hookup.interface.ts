@@ -1,5 +1,6 @@
 export default interface Hookup {
-    date: Date,
+    startDate: Date,
+    endDate: Date,
     gender: string,
     images: participants[],
     status: string,
@@ -7,6 +8,6 @@ export default interface Hookup {
 
 interface participants {
     image: string,
-    id: string,
+    userId: string,
     isWinner: boolean
 }

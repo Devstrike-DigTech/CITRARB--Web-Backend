@@ -51,6 +51,9 @@ class HookupController implements Controller {
 
         this.router.route(`${this.path}/`).post(authenticate, RestrictTo('admin'), validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/active`).get(authenticate, this.getActive)
+        this.router.route(`${this.path}/last_winners`).get(authenticate, this.getLastWinners)
+        this.router.route(`${this.path}/all_winners`).get(this.getAllWinners)
+        this.router.route(`${this.path}/`).get(authenticate, this.getAll)
         this.router.route(`${this.path}/:id/submit`).patch(authenticate, this.uploadImage ,this.submitPhoto)
         this.router.route(`${this.path}/:id`).patch(authenticate, RestrictTo('admin'), validationMiddleware(validate.update), this.updateWinner)
         this.router.route(`${this.path}/:id`).put(authenticate, RestrictTo('admin'), validationMiddleware(validate.setStatus), this.setStatus)
@@ -74,7 +77,7 @@ class HookupController implements Controller {
             const query = req.query.gender || 'male'
             const data = await this.service.getActive((query as string));
 
-            res.status(201).json({
+            res.status(200).json({
                 status: 'success',
                 data,
             })
@@ -83,11 +86,51 @@ class HookupController implements Controller {
         }
     }
 
+    private getAll = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.service.getAll(req.query);
+
+            res.status(200).json({
+                status: 'success',
+                data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    }
+
+    private getLastWinners = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.service.getLastWinners();
+
+            res.status(200).json({
+                status: 'success',
+                data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    } 
+
+    private getAllWinners = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const gender = (req.query.gender as string) || 'male'
+            const data = await this.service.getAllWinners(gender);
+
+            res.status(200).json({
+                status: 'success',
+                data,
+            })
+        } catch (error:any) {
+            next(new HttpException(error.message, error.statusCode))
+        }
+    } 
+
     private submitPhoto = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             const data = await this.service.add(req.params.id, req.user.id, req.body.image);
 
-            res.status(201).json({
+            res.status(200).json({
                 status: 'success',
                 data,
             })
@@ -100,7 +143,7 @@ class HookupController implements Controller {
         try {
             const data = await this.service.setWinner(req.params.id, req.body.user);
 
-            res.status(201).json({
+            res.status(200).json({
                 status: 'success',
                 data,
             })
@@ -113,7 +156,7 @@ class HookupController implements Controller {
         try {
             const data = await this.service.updateStatusHookup(req.params.id, req.body.status);
 
-            res.status(201).json({
+            res.status(200).json({
                 status: 'success',
                 data,
             })
