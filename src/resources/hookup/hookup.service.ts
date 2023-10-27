@@ -147,6 +147,7 @@ export default class HookupService {
     }
     public async getAllWinners(gender: string){
         try {
+            const isActive = await hookupModel.findOne({gender})
             const doc = await hookupModel.aggregate([
                 {
                     $unwind: "$images"
@@ -188,7 +189,10 @@ export default class HookupService {
                     }
                 }
             ])
-            return doc
+            return {
+                winners: doc,
+                isActive: isActive ? true : false
+            }
         } catch (error:any) {
             throw new HttpException(error.message, error.statusCode)
         }
