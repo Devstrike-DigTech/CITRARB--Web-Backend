@@ -15,6 +15,7 @@ async function cacheMiddleware (req:Request, res:Response, next:NextFunction): P
     
         
         const cachedResult = await App.redisClient.get(key)
+        console.log(cachedResult, 'cached result')
         if(cachedResult) {
 
         result = JSON.parse(cachedResult)
