@@ -31,16 +31,30 @@ class App {
 
   private initializeMiddleware () {
     redisClient(redis).then((res:any) => App.redisClient = res).catch((e) => console.log(e))
-    const corsOptions = {
-      origin: '*', // Replace with the origin of your React app
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-      credentials: true, // Allow cookies and authorization headers
-    };
+    // const corsOptions = {
+    //   origin: '*', // Replace with the origin of your React app
+    //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    //   credentials: true, // Allow cookies and authorization headers
+    // };
     
-    this.app.use(cors())
+    const corsOptions = {
+      origin: [
+        "http://localhost:3000",
+      ],
+      credentials: true,
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "x-public-key",
+        "x-secret-key",
+        "x-token",
+      ],
+    };
+
+    this.app.use(cors<cors.CorsRequest>(corsOptions));
     this.app.use(compression())
     this.app.use(morgan('dev'))
-    this.app.use(helmet())
+    // this.app.use(helmet({crossOriginEmbedderPolicy: false}))
     this.app.use(cookieParser())
     this.app.use(express.json())
     this.app.use(bodyParser.urlencoded({ extended: true }))
