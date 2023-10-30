@@ -74,7 +74,8 @@ class App {
       this.app.use(`/api`, controller.router)
     })
     this.app.all('*', (req, res, next) => {
-      next(new HttpException(`Can't find ${req.originalUrl} on this server!`, 404));
+      res.send("<h1>Welcome to Coal City Connect</h1> <p>For more information <a href = 'mailto: connectcoalcity@gmail.com'>Contact</a> Support</p>")
+      // next(new HttpException(`Can't find ${req.originalUrl} on this server!`, 404));
     });
   }
 
