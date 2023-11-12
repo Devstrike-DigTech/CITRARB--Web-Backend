@@ -11,12 +11,13 @@ export default class HookupService {
   public async create(gender: string) {
     try {
       const isToday = await this.getActive(gender);
-      if (isToday) throw new Error(`Already ongoing contest for ${gender}`);
+      if (isToday) throw new HttpException(`Already ongoing contest for ${gender}`, 400);
       const hookup = await hookupModel.create({ gender });
 
       return hookup;
     } catch (error: any) {
-      throw new Error(error);
+      console.log(error.message)
+      throw new HttpException(error.message, error.statusCode);
     }
   }
 
@@ -28,7 +29,7 @@ export default class HookupService {
 
       return hookup;
     } catch (error: any) {
-      throw new Error(error);
+      throw new HttpException(error.message, error.statusCode);
     }
   }
 
@@ -44,7 +45,7 @@ export default class HookupService {
 
       return hookup;
     } catch (error: any) {
-      throw new Error(error);
+      throw new HttpException(error.message, error.statusCode);
     }
   }
 
@@ -60,7 +61,7 @@ export default class HookupService {
 
       return hookups;
     } catch (error: any) {
-      throw new Error(error);
+      throw new HttpException(error.message, error.statusCode);
     }
   }
 
@@ -96,7 +97,7 @@ export default class HookupService {
 
       return newHookup;
     } catch (error: any) {
-      throw new Error(error);
+      throw new HttpException(error.message, error.statusCode);
     }
   }
 
@@ -113,13 +114,16 @@ export default class HookupService {
       });
 
       hookup.images = newArr;
+      hookup.status = "inactive";
+      hookup.endDate = new Date();
 
       await hookup?.save();
 
       return hookup;
     } catch (error: any) {
-      throw new Error(error);
+      throw new HttpException(error.message, error.statusCode);
     }
+    
   }
 
   public async updateStatusHookup(id: string, status: string) {
@@ -131,7 +135,7 @@ export default class HookupService {
       );
       return hookup;
     } catch (error: any) {
-      throw new Error(error);
+      throw new HttpException(error.message, error.statusCode);
     }
   }
 
@@ -225,6 +229,7 @@ export default class HookupService {
       return {
         winners: doc,
         isActive: isActive ? true : false,
+        hookupId: isActive?.id
       };
     } catch (error: any) {
       throw new HttpException(error.message, error.statusCode);

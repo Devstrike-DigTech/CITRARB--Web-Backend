@@ -35,8 +35,9 @@ class OccupationService {
     public async get(id: string): Promise<Occupation | any | Error> {
         try {
             const occupation = await this.OccupationModel.findOne({userId: id});
+            console.log(occupation)
 
-            return occupation || {}
+            return occupation
 
         } catch (error:any) {
             throw new Error(error)

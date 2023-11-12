@@ -97,7 +97,7 @@ class App {
       url = `${process.env.DATABASE}`
     }
     connect(url, connectionOptions).then(() => {
-      console.log('Database Connected Successfully')
+      console.log(`Database Connected Successfully on ${url}`)
     })
   }
 

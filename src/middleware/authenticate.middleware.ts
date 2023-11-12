@@ -6,12 +6,12 @@ import userModel from '@/resources/user/user.model'
 import HttpException from '@/utils/exceptions/httpExceptions'
 
 async function authenticate (req:Request, res:Response, next:NextFunction): Promise<Response | void> {
-    console.log(req.body)
     const bearer = req.headers.authorization
 
     if(!bearer || !bearer.startsWith('Bearer')){
         return next(new HttpException('Unauthorized access', 401))
     }
+    if(!bearer.split('Bearer ')[1]) return next(new HttpException('Unauthorized access', 401))
     const accessToken = bearer.split('Bearer ')[1].trim()
     try {
         const payload: Token | jwt.JsonWebTokenError = await verifyToken(accessToken)
