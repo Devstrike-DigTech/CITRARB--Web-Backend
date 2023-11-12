@@ -111,15 +111,15 @@ class App {
   }
 
   public listen () {
-  var httpServer = http.createServer(this.app);
-  var httpsServer = https.createServer(this.credentials(), this.app);
-    // this.app.listen(this.port, () => {
-    //   console.log(`Application running on port ${this.port}`)
-    // })
-    httpServer.listen(this.port, () => {
-    console.log(`Application running on port ${this.port}`)
-    });
-    httpsServer.listen(3443);
+  // var httpServer = http.createServer(this.app);
+  // var httpsServer = https.createServer(this.credentials(), this.app);
+    this.app.listen(this.port, () => {
+      console.log(`Application running on port ${this.port}`)
+    })
+    // httpServer.listen(this.port, () => {
+    // console.log(`Application running on port ${this.port}`)
+    // });
+    // httpsServer.listen(3443);
   }
 }
 
