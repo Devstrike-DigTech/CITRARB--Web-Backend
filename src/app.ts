@@ -1,10 +1,6 @@
 import path from 'path'
-import fs from 'fs'
-import http from 'http'
-import https from 'https'
 import express, { Application } from 'express'
 import { connect, ConnectOptions } from 'mongoose'
-import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
 import cors from 'cors'
@@ -12,7 +8,6 @@ import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import Controller from '@/utils/interfaces/Controller.interface'
 import ErrorMiddleware from '@/middleware/error.middleware'
-import HttpException from './utils/exceptions/httpExceptions'
 import redisClient from '@/utils/cache/connection'
 import * as redis from 'redis';
 class App {
@@ -42,6 +37,7 @@ class App {
     const corsOptions = {
       origin: [
         "http://localhost:3000",
+        "https://coalcityconnectpanel.netlify.app"
       ],
       credentials: true,
       allowedHeaders: [
@@ -85,13 +81,6 @@ class App {
     this.app.use(ErrorMiddleware)
   }
 
-  private credentials () {
-  const privateKey  = fs.readFileSync('/etc/letsencrypt/live/{hostname}/privkey.pem', 'utf8');
-  const certificate = fs.readFileSync('/etc/letsencrypt/live/{hostname}/cert.pem', 'utf8');
-
-  return {key: privateKey, cert: certificate};
-  }
-
   private initializeDB () {
     type ConnectionOptionsExtend = {
       useNewUrlParser: boolean
@@ -111,15 +100,9 @@ class App {
   }
 
   public listen () {
-  // var httpServer = http.createServer(this.app);
-  // var httpsServer = https.createServer(this.credentials(), this.app);
     this.app.listen(this.port, () => {
       console.log(`Application running on port ${this.port}`)
     })
-    // httpServer.listen(this.port, () => {
-    // console.log(`Application running on port ${this.port}`)
-    // });
-    // httpsServer.listen(3443);
   }
 }
 
