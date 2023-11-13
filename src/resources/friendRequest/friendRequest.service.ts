@@ -43,7 +43,22 @@ export default class FriendRequestService {
         try {
             // const friendRequests = await friendRequestModel.find({userId: id, status: 'pending'}).populate({path: "requester", select: ["id", "username", "photo"]})
             // return friendRequests
-            const friendRequests = friendRequestModel.find({userId: id}).populate({path: "requester", select: ["id", "username", "photo"]})
+            const friendRequests = friendRequestModel.find({userId: id}).populate({path: "requester", select: ["_id", "username", "photo"]})
+            console.log(await friendRequestModel.find({userId: id}))
+            const features = new Query(friendRequests, query).filter().sort().limitFields().paginate();
+
+            const result = await features.query;
+            return result
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
+    public async getSentFriendRequests(id: string, query: any): Promise<FriendRequest[] | Error> {
+        try {
+            // const friendRequests = await friendRequestModel.find({userId: id, status: 'pending'}).populate({path: "requester", select: ["id", "username", "photo"]})
+            // return friendRequests
+            const friendRequests = friendRequestModel.find({requester: id}).populate({path: "userId", select: ["id", "username", "photo"]})
             const features = new Query(friendRequests, query).filter().sort().limitFields().paginate();
 
             const result = await features.query;

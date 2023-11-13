@@ -48,4 +48,15 @@ export default class EventAttendanceService {
         }
     }
 
+    public async getAll(userId: string): Promise<any[]> {
+        try {
+            const eventAttendances = await eventAttendanceModel.find({userId})
+
+            console.log(eventAttendances, 'here')
+            return eventAttendances
+        } catch (error:any) {
+            throw new Error(error);
+        }
+    }
+
 }

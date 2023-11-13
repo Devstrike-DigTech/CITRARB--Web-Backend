@@ -31,7 +31,13 @@ const userSchema = new Schema<User> ({
         type: Boolean,
         default: true,
         select: false
-    }
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female']
+    },
+    phone: String,
+    location: String,
 }, {
     toJSON: {
         transform: function (doc, ret) {

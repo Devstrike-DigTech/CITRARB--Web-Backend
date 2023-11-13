@@ -16,7 +16,7 @@ const occupationSchema = new Schema<Occupation>({
     },
     category: {
         type: String,
-        enum: ['Tech', 'Service', 'Medical', 'Media', 'Business', 'Education', "Others"]
+        enum: ['Tech', 'Medical', 'Artisan', "Others"]
     },
     description: {
         type: String,

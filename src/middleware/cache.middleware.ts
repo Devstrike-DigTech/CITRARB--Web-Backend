@@ -15,7 +15,7 @@ async function cacheMiddleware (req:Request, res:Response, next:NextFunction): P
     
         
         const cachedResult = await App.redisClient.get(key)
-        if(cachedResult) {
+        if(cachedResult && Object.keys(cachedResult).length > 0) {
 
         result = JSON.parse(cachedResult)
         res.status(200).json({
@@ -27,6 +27,7 @@ async function cacheMiddleware (req:Request, res:Response, next:NextFunction): P
             next()
         }
     } catch (error:any) {
+        console.log(error)
         next(new HttpException('Unauthorized access', 401))
     }
 }

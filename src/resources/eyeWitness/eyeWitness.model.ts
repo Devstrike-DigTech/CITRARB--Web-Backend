@@ -2,18 +2,8 @@ import { Schema, model } from "mongoose";
 import EyeWitness from "./eyeWitness.interface";
 
 const eyeWitnessSchema = new Schema<EyeWitness>({
-    videos: [
-        {
-            fileId: String,
-            webContentLink: String
-        }
-    ],
-    images: [
-        {
-            fileId: String,
-            webContentLink: String
-        }
-    ],
+    video: String,
+    images: [String],
     location: {
         type: String,
     },

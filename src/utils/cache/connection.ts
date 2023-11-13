@@ -10,7 +10,11 @@
 //   })();
 
 const redisClient = async (redis: any) => {
-    let redisClient = redis.createClient();
+    //local
+    // let redisClient = redis.createClient();
+
+    //onrender
+    let redisClient = redis.createClient({url: process.env.REDIS_URL_ONRENDER});
   
     redisClient.on("error", (error:any) => console.error(`Error : ${error}`));
   

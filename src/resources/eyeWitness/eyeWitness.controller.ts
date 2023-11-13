@@ -8,6 +8,7 @@ import EyeWitnessService from "./eyeWitness.service";
 import validate from './eyeWitness.validation'
 import RatingController from "../reactionUploads/rating.controller";
 import restrictTo from "@/middleware/restrictTo.middleware";
+import sharp from "sharp";
 
 
 class EyeWitnessController implements Controller {
@@ -15,7 +16,43 @@ class EyeWitnessController implements Controller {
     public path = '/eye_witness'
     public router = Router()
 
-    private multerStorage = multer.memoryStorage();
+    private multerStorage = multer.diskStorage({
+        filename(req, file, callback) {
+            let filename;
+
+            
+            if(file.mimetype.startsWith('video')) {
+                filename = `upload-video--${Date.now()}${Math.ceil(Math.random() * 10000)}.mp4`
+            }else {
+                filename = `upload-image--${Date.now()}${Math.ceil(Math.random() * 10000)}.jpeg`
+            }
+
+            callback(null, filename)
+        },
+        destination(req, file, callback) {
+            const url = file.mimetype.startsWith('video') ? 'public/uploads/videos' : 'public/uploads/images'
+            callback(null, url)
+        },
+    })
+
+    private multerFilter = (req:any, file:any, cb:any) => {
+        if (file.mimetype.startsWith('image') || file.mimetype.startsWith('video')) {
+            cb(null, true);
+        } else {
+            cb(new HttpException('file has to be an image or video.', 400), false);
+        }
+    };
+
+    private upload = multer({
+        storage: this.multerStorage,
+        fileFilter: this.multerFilter,
+        limits: {fileSize: 50 * 1024 * 1024}
+    });
+
+    private uploadFile = this.upload.fields([
+        { name: 'images', maxCount: 3 },
+        { name: 'video', maxCount: 1 }
+    ]);
 
     constructor(){
         this.initializeRouter()
@@ -24,7 +61,7 @@ class EyeWitnessController implements Controller {
     private initializeRouter(){
         this.router.use(`${this.path}/:uploadId/reactions`, new RatingController().router)
 
-        this.router.post(`${this.path}/`, authenticate, this.upload.any(), validationMiddleware(validate.create), this.create)
+        this.router.post(`${this.path}/`, authenticate, this.uploadFile, this.middle, validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 
         this.router.route(`${this.path}/verification`).get(authenticate, restrictTo('admin') ,this.verifyContent)
@@ -38,12 +75,7 @@ class EyeWitnessController implements Controller {
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             req.body.userId = req.user.id
-            const files = req.files as Express.Multer.File[]
-            const videos = files.filter((el: any) => el.mimetype.startsWith('video'))
-            const images = files.filter((el: any) => el.mimetype.startsWith('image'))
-            req.body.images = images
-            req.body.videos = videos
-            console.log(req.body)
+
             const data = await this.service.create(req.body);
 
             res.status(201).json({
@@ -54,6 +86,17 @@ class EyeWitnessController implements Controller {
             next(new HttpException(error.message, error.statusCode))
         }
     }
+
+    private middle = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+            if(!req.files) next();
+            const files = req.files
+            if((files as any).images) req.body.images = (files as any).images.map((el:any) => el.filename)
+            if((files as any).video) req.body.video = (files as any).video[0].filename
+
+            next()
+    }
+
+    
 
     private get = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
@@ -135,36 +178,6 @@ class EyeWitnessController implements Controller {
             next(new HttpException(error.message, error.statusCode))
         }
     }
-
-    private formatFile = async(req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-        try {
-            if(!req.files) {
-                next(new HttpException("upload an image guy!!!", 400))
-            }
-
-            if(req.files && req.files?.length > 3) {
-                next(new HttpException("cannot upload more than 3 images for a product!!!", 400))
-            }
-            next()
-        } catch (error:any) {
-            next(new HttpException(error.message, error.statusCode))
-        }
-    }
-
-    private multerFilter = (req: any, file: any, cb: any) => {
-        const fileSize = parseInt(req.headers["content-length"])
-        if (file.mimetype.startsWith('image') || file.mimetype.startsWith('video')) {
-          cb(null, true);
-        } else {
-          cb(new HttpException('Not an image! Please upload only images and videos.', 400), false);
-        }
-      };
-
-    private upload = multer({
-        storage: this.multerStorage,
-        fileFilter: this.multerFilter,
-      });
-
 }
 
 export default EyeWitnessController

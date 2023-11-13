@@ -6,8 +6,7 @@ import validationMiddleware from "@/middleware/validation.middleware";
 import authenticate from "@/middleware/authenticate.middleware";
 import MarketService from "./market.service";
 import validate from './market.validation'
-import GoogleDriveAPI from "../shared/uploads/uploads.service";
-
+import sharp from "sharp";
 
 class MarketController implements Controller {
     private service = new MarketService()
@@ -16,16 +15,25 @@ class MarketController implements Controller {
     public router = Router()
 
 
-       private multerStorage = multer.memoryStorage()
-    // private multerStorage = multer.diskStorage({
-    //     destination(req, file, callback) {
-    //     callback(null, 'public/')
-    //     },
-    //     filename(req, file, callback) {
-    //         console.log(file, 'what is happening for God sake')
-    //         callback(null, file.originalname)
-    //     },
-    // });
+    private multerStorage = multer.memoryStorage();
+
+    private multerFilter = (req:any, file:any, cb:any) => {
+        console.log('reach')
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    } else {
+        cb(new HttpException('Not an image! Please upload only images.', 400), false);
+    }
+    };
+
+    private upload = multer({
+    storage: this.multerStorage,
+    fileFilter: this.multerFilter
+    });
+
+    private uploadImages = this.upload.fields([
+    { name: 'images', maxCount: 3 }
+    ]);
 
     constructor(){
         this.initializeRouter()
@@ -33,7 +41,7 @@ class MarketController implements Controller {
 
     private initializeRouter(){
 
-        this.router.route(`${this.path}/`).post(authenticate, this.upload.array('images', 3), this.formatFile, validationMiddleware(validate.create), this.create)
+        this.router.route(`${this.path}/`).post(authenticate, this.uploadImages, this.resizeImages, validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
 
         this.router.get(`${this.path}/:id`, authenticate, this.get)
@@ -44,12 +52,7 @@ class MarketController implements Controller {
     private create = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             console.log(req.body)
-            console.log(req.files)
             req.body.userId = req.user.id
-            const files = req.files as Express.Multer.File[]
-            // req.body.files = files
-            req.body.files = files
-            
             const data = await this.service.create(req.body);
 
             res.status(201).json({
@@ -117,38 +120,41 @@ class MarketController implements Controller {
         }
     }
 
-    private formatFile = async(req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    private resizeImages = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            if(!req.files) {
-                next(new HttpException("upload an image guy!!!", 400))
+            if (!req.files || !('images' in req.files)) {
+                // If there are no uploaded images, move to the next middleware
+                return next();
             }
-
-            if(req.files && req.files?.length > 3) {
-                next(new HttpException("cannot upload more than 3 images for a product!!!", 400))
-            }
-            next()
-        } catch (error:any) {
-            next(new HttpException(error.message, error.statusCode))
+    
+            const images = (req.files as { images: Express.Multer.File[] }).images;
+    
+            // Initialize req.body as an object with an 'images' property
+            (req.body as { images: string[] }).images = [];
+    
+            await Promise.all(
+                images.map(async (image: Express.Multer.File, i: number) => {
+                    const filename = `product--${Date.now()}-${i + 1}.jpeg`;
+    
+                    await sharp(image.buffer)
+                        .resize(2000, 1333)
+                        .toFormat('jpeg')
+                        .jpeg({ quality: 90 })
+                        .toFile(`public/products/${filename}`);
+    
+                    // Push the filenames to req.body.images
+                    (req.body as { images: string[] }).images.push(filename);
+                })
+            );
+    
+            next();
+        } catch (error: any) {
+            next(new HttpException(error.message, error.statusCode));
         }
-    }
-
-    private multerFilter = (req: any, file: any, cb: any) => {
-        if (file.mimetype.startsWith('image')) {
-          cb(null, true);
-        } else {
-          cb(new HttpException('Not an image! Please upload only images.', 400), false);
-        }
-      };
-
-    private upload = multer({
-        storage: this.multerStorage,
-        fileFilter: this.multerFilter,
-      });
-
-    private uploadProductImages = this.upload.fields([
-        { name: 'images', maxCount: 3 },
-      ]);
-
+    };
+    
+    
+    
 }
 
 export default MarketController

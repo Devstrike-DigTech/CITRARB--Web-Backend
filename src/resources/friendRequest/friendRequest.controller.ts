@@ -19,6 +19,7 @@ export default class FriendRequestController implements Controller {
     private initializeRouter(){
         this.router.route(`${this.path}/`).post(authenticate, validationMiddleware(validate.create), this.create)
         this.router.route(`${this.path}/`).get(authenticate, this.getAll)
+        this.router.route(`${this.path}/sent`).get(authenticate, this.getAllTheRequestsIHaveSent)
 
         this.router.route(`${this.path}/:id`).patch(authenticate, this.update)
     }
@@ -50,6 +51,20 @@ export default class FriendRequestController implements Controller {
         }
     }
 
+    private getAllTheRequestsIHaveSent = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const data = await this.friendRequestService.getSentFriendRequests(req.user.id, req.query)
+
+            res.status(200).json({
+                status: 'success',
+                data
+            })
+        } catch (error:any) {
+           next(new HttpException(error.message, error.statusCode)) 
+        }
+    }
+
+
     private update = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         try {
             const data = await this.friendRequestService.updateRequest(req.params.id, req.user.id, req.body.status)
@@ -63,3 +78,4 @@ export default class FriendRequestController implements Controller {
         }
     }
 }
+

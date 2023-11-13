@@ -1,27 +1,24 @@
 import marketModel from "./market.model";
 import Market from "./market.interface";
 import Query from "@/utils/apiFeatures/Query";
-import GoogleDriveAPI from "../shared/uploads/uploads.service";
+import userModel from "../user/user.model";
+import HttpException from "@/utils/exceptions/httpExceptions";
 
 
 class MarketService {
-    private googleDriveAPI = new GoogleDriveAPI();
-
     public async create (data: any): Promise<Market | undefined> {
         try {
-            // check the number of products user have uploaded so far
-            const noOfProducts = await this.getAll({userId: data.userId});
-            if(noOfProducts.length == 3) {
-                throw new Error("You cannot upload more than 3 products")
-            } 
-            const images = await this.googleDriveAPI.uploadImages(data.files)
-            console.log(images, 'market ')
+            const user = await userModel.findById(data.userId);
+
+            if (user && !user.phone) {
+                throw new HttpException("You do not have a phone in your profile for contact", 400)
+            }
             const marketPayload = {
                 name: data.name,
                 description: data.description,
                 price: data.price,
                 category: data.category,
-                images,
+                images: data.images,
                 userId: data.userId
             }
             const market = await marketModel.create(marketPayload)
@@ -57,6 +54,15 @@ class MarketService {
         }
     }
 
+    public async getUserMarket(id: string): Promise <any[]> {
+        try {
+            const res = await marketModel.find({userId: id})
+            return res
+        } catch (error:any) {
+            throw new Error(error)
+        }
+    }
+
     public async update(userId: string, id: string, data: Partial<Market>) : Promise<Market> {
         try {
             const result = await marketModel.findOneAndUpdate({id, userId}, data, {runValidators: true, new: true})
@@ -74,7 +80,6 @@ class MarketService {
             const result = await marketModel.findOneAndDelete({id, userId});
             if(!result) throw new Error("Not found")
 
-            await this.googleDriveAPI.deleteFile(result.images)
 
         } catch (error:any) {
             throw new Error(error)

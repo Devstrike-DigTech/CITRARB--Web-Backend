@@ -1,6 +1,7 @@
 import occupationModel from "./occupation.model";
 import Occupation from "./occupation.interface";
 import Query from "@/utils/apiFeatures/Query";
+import HttpException from "@/utils/exceptions/httpExceptions";
 
 class OccupationService {
     private OccupationModel = occupationModel
@@ -10,8 +11,14 @@ class OccupationService {
      * @param data Occupation payload
      * @returns newly created occupation details
      */
-    public async create(data: Occupation): Promise<Occupation | Error> {
+    public async create(data: Occupation, userId:string): Promise<Occupation | Error> {
         try {
+            const isOcc = await this.get(userId);
+
+            if(isOcc) {
+                throw new HttpException("Alread has an Occupaion", 400)
+            }
+
             const occupation = await this.OccupationModel.create(data);
 
             return occupation
@@ -25,11 +32,10 @@ class OccupationService {
      * @param id - user id  
      * @returns 
      */
-    public async get(id: string): Promise<Occupation | Error> {
+    public async get(id: string): Promise<Occupation | any | Error> {
         try {
             const occupation = await this.OccupationModel.findOne({userId: id});
-
-            if(!occupation) throw new Error("Not found!")
+            console.log(occupation)
 
             return occupation
 

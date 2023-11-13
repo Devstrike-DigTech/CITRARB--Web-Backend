@@ -11,6 +11,7 @@ const eventSchema = new Schema<Event>({
         type: [Schema.Types.ObjectId],
         ref: "User"
     },
+    image: String,
     time: {
         type: Date,
         required: [true, "Provide a date for this event"]

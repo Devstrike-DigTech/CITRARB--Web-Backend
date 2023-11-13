@@ -15,19 +15,17 @@ const marketSchema = new Schema<Market> ({
         type: String,
         // enum: ['Clothing', 'Electronics', 'Others']
     },
-    images: 
-        [
-            {
-                fileId: String,
-                webContentLink: String
-            }
-        ],
+    images: [String],
     description: {
         type: String,
     },
     active: {
         type: Boolean,
         default: true,
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
     },
     userId: {
         type: Schema.Types.ObjectId,
